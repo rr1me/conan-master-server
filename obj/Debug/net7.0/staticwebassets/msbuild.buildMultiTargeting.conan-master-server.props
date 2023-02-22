@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\conan-master-server.props" />
+</Project>
