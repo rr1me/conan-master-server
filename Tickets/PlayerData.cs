@@ -61,7 +61,7 @@ public class PlayerData
             LastLoginTime = DateTime.UtcNow,
             InfoResultPayload = new
             {
-                AccountInfo = GetAccountInfo(user, titleId, accountInfo)
+                AccountInfo = await GetAccountInfo(user, titleId, accountInfo)
             },
             EntityToken = new
             {

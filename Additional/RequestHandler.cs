@@ -50,8 +50,8 @@ public class RequestHandler
         var r = await httpClient.SendAsync(request);
         var responseString = await r.Content.ReadAsStringAsync();
 
-        var jsonTest = JObject.Parse(responseString)["response"].First.First;
-        var json = jsonTest.Type == JTokenType.Array ? jsonTest.First.ToString() : jsonTest.ToString();
+        var jToken = JObject.Parse(responseString)["response"].First.First;
+        var json = jToken.Type == JTokenType.Array ? jToken.First.ToString() : jToken.ToString();
 
         return JsonConvert.DeserializeObject<T>(json);
     }

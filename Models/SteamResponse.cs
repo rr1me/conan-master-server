@@ -1,19 +1,4 @@
 ﻿namespace conan_master_server.Models;
-//
-// public class SteamResponse<T>
-// {
-//     public T Response { get; set; }
-// }
-//
-// public class ResponseParams
-// {
-//     public Params Params { get; set; }
-// }
-//
-// public class ResponseInfo
-// {
-//     public SteamPlayerInfo Players { get; set; }
-// }
 
 public class Params
 {
