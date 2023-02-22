@@ -8,10 +8,12 @@ namespace conan_master_server.Tickets;
 public class PlayerData
 {
     private readonly RequestHandler _requestHandler;
+    private readonly TicketHandler _ticketHandler;
 
-    public PlayerData(RequestHandler requestHandler)
+    public PlayerData(RequestHandler requestHandler, TicketHandler ticketHandler)
     {
         _requestHandler = requestHandler;
+        _ticketHandler = ticketHandler;
     }
 
     private readonly object stubObj = new { };
@@ -19,38 +21,34 @@ public class PlayerData
 
     public async Task<object> Generate(long steamId, string titleId, DatabaseContext db, HttpContext httpContext, RandomGenerator randomGenerator)
     {
-        var sessionTicket = MakeSessionTicket(randomGenerator, titleId, out var playFabId,
-            out var publisherId, out var entityId,
-            out var unknownId, out var endToken);
-        
         var accountInfo = await _requestHandler.GetUserInfo(steamId);
 
         var user = db.Users.FirstOrDefault(x => x.SteamId == steamId);
         if (user == null)
         {
-            // var date = DateTime.UtcNow;
+            var ticketObject = _ticketHandler.MakeSessionTicket(titleId, randomGenerator);
             user = new ConanUser
             {
                 SteamId = steamId,
-                EntityId = entityId,
+                EntityId = ticketObject.EntityId,
                 Ip = httpContext.Request.Host.Host,
-                PlayfabId = playFabId,
-                PublisherId = publisherId,
+                PlayfabId = ticketObject.PlayFabId,
+                PublisherId = ticketObject.PublisherId,
                 SpecId = titleId, //?
-                Ticket = sessionTicket,
+                Ticket = ticketObject.SessionTicket,
                 Token = "token", //?
                 Username = accountInfo.PersonaName, //?
                 CreationDate = DateTime.UtcNow
             };
 
             db.Users.Add(user);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
         return new
         {
-            SessionTicket = sessionTicket,
-            PlayFabId = playFabId,
+            SessionTicket = user.Ticket,
+            PlayFabId = user.PlayfabId,
             NewlyCreated = false,
             SettingsForUser = new
             {
@@ -67,7 +65,7 @@ public class PlayerData
             {
                 EntityToken = "token",
                 TokenExpiration = "when",
-                Entity = CreateTitle(entityId)
+                Entity = CreateTitle(user.EntityId)
             },
             TreatmentAssignment = new
             {
@@ -77,27 +75,8 @@ public class PlayerData
         };
     }
 
-    private string MakeSessionTicket(RandomGenerator randomGenerator, 
-        string titleId, 
-        out string playFabId, 
-        out string publisherId,
-        out string entityId, out string unknownId, out string endToken)
-    {
-        playFabId = randomGenerator.Generate16();
-        publisherId = randomGenerator.Generate16();
-        entityId = randomGenerator.Generate16();
-        // titleId = randomGenerator.Generate5();
-
-        unknownId = randomGenerator.Generate16();
-        endToken = randomGenerator.GenerateEnd();
-
-        return $"{playFabId}-{publisherId}-{entityId}-{titleId}-{unknownId}-{endToken}";
-    }
-
     private async Task<object> GetAccountInfo(ConanUser user, string titleId, SteamPlayerInfo accountInfo)
     {
-        // var accountInfo = await _requestHandler.GetUserInfo(user.SteamId);
-
         return new
         {
             PlayFabId = user.PlayfabId,
@@ -129,7 +108,7 @@ public class PlayerData
     private TitleInfo CreateTitleInfo(ConanUser user) =>
         new()
         {
-            DisplayName = user.Username + user.Id,
+            DisplayName = user.Username + $"{user.Id:D4}",
             Created = user.CreationDate,
             LastLogin = DateTime.UtcNow,
             FirstLogin = user.CreationDate,

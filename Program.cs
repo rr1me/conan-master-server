@@ -21,6 +21,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddSingleton<TicketHandler>();
 builder.Services.AddTransient<RandomGenerator>();
 builder.Services.AddSingleton<RequestHandler>();
 
