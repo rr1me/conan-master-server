@@ -1,6 +1,5 @@
 ﻿using conan_master_server.Additional;
 using conan_master_server.Data;
-using conan_master_server.ModelBinder;
 using conan_master_server.Models;
 using conan_master_server.Tickets;
 using conan_master_server.Tokens;
@@ -35,19 +34,11 @@ public class ConanController : ControllerBase
         _wrapper.data = await _playerData.Generate(steamResponse.SteamId, authTicket.TitleId, _db, HttpContext,
             _randomGenerator);
         return Ok(_wrapper);
-
-        return Ok(new
-        {
-            code = 200,
-            status = "OK",
-            data = await _playerData.Generate(steamResponse.SteamId, authTicket.TitleId, _db, HttpContext, _randomGenerator)
-        });
     }
 
     [HttpPost("token")]
     public async Task<IActionResult> GetIdentityToken([FromBody]TokenRequest tokenRequest)
     {
-        // Console.WriteLine(body);
         _wrapper.data = new
         {
             FunctionResult = _tokenGenerator.Generate()

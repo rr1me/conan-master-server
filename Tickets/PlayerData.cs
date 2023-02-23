@@ -59,7 +59,19 @@ public class PlayerData
             LastLoginTime = DateTime.UtcNow,
             InfoResultPayload = new
             {
-                AccountInfo = GetAccountInfo(user, titleId, accountInfo)
+                AccountInfo = GetAccountInfo(user, titleId, accountInfo),
+                UserInventory = stubList,
+                UserData = stubObj,
+                UserDataVersion = 149,
+                UserReadOnlyDataVersion = 0,
+                CharacterInventories = stubList,
+                PlayerProfile = new
+                {
+                    user.PublisherId,
+                    TitleId = titleId,
+                    PlayerId = user.PlayfabId,
+                    DisplayName = user.Username + titleId
+                }
             },
             EntityToken = new
             {
@@ -81,7 +93,7 @@ public class PlayerData
         {
             PlayFabId = user.PlayfabId,
             Created = user.CreationDate,
-            TitleInfo = CreateTitleInfo(user),
+            TitleInfo = CreateTitleInfo(user, titleId),
             PrivateInfo = stubObj,
             SteamInfo = new
             {
@@ -89,26 +101,14 @@ public class PlayerData
                 SteamName = accountInfo.PersonaName,
                 SteamCountry = accountInfo.LocCountryCode,
                 SteamCurrency = "RUB"
-            },
-            UserInventory = stubList,
-            UserData = stubObj,
-            UserDataVersion = 149,
-            UserReadOnlyDataVersion = 0,
-            CharacterInventories = stubList,
-            PlayerProfile = new
-            {
-                user.PublisherId,
-                TitleId = titleId,
-                PlayerId = user.PlayfabId,
-                DisplayName = user.Username
             }
         };
     }
 
-    private TitleInfo CreateTitleInfo(ConanUser user) =>
+    private TitleInfo CreateTitleInfo(ConanUser user, string titleId) =>
         new()
         {
-            DisplayName = user.Username + $"{user.Id:D4}",
+            DisplayName = user.Username + titleId,
             Created = user.CreationDate,
             LastLogin = DateTime.UtcNow,
             FirstLogin = user.CreationDate,
