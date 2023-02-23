@@ -28,7 +28,7 @@ public class ConanController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(AuthTicket authTicket)
+    public async Task<IActionResult> Login([FromBody]AuthTicket authTicket)
     {
         var steamResponse = await _requestHandler.AuthUserTicket(authTicket.SteamTicket);
 
