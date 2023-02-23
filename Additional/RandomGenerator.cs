@@ -16,7 +16,7 @@ public class RandomGenerator
     };
 
     public string Generate16() => Generate(16).ToUpper();
-    public string Generate5() => Generate(5).ToUpper();
+    // public string Generate5() => Generate(5).ToUpper();
     public string GenerateEnd() => Generate(43) + "=";
 
     private string Generate(int symbolCount)

@@ -59,7 +59,7 @@ public class PlayerData
             LastLoginTime = DateTime.UtcNow,
             InfoResultPayload = new
             {
-                AccountInfo = await GetAccountInfo(user, titleId, accountInfo)
+                AccountInfo = GetAccountInfo(user, titleId, accountInfo)
             },
             EntityToken = new
             {
@@ -75,7 +75,7 @@ public class PlayerData
         };
     }
 
-    private async Task<object> GetAccountInfo(ConanUser user, string titleId, SteamPlayerInfo accountInfo)
+    private object GetAccountInfo(ConanUser user, string titleId, SteamPlayerInfo accountInfo)
     {
         return new
         {

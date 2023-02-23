@@ -1,6 +1,8 @@
 using conan_master_server.Additional;
 using conan_master_server.Data;
+using conan_master_server.ModelBinder;
 using conan_master_server.Tickets;
+using conan_master_server.Tokens;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,17 +17,23 @@ builder.Services.AddDbContext<DatabaseContext>(x =>
 });
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.ModelBinderProviders.Insert(0, new CustomModelBinderProvider());
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient();
 
-builder.Services.AddSingleton<TicketHandler>();
 builder.Services.AddTransient<RandomGenerator>();
+builder.Services.AddScoped<ResponseWrapper>();
+
+builder.Services.AddSingleton<TicketHandler>();
 builder.Services.AddSingleton<RequestHandler>();
 
 builder.Services.AddSingleton<PlayerData>();
+builder.Services.AddSingleton<TokenGenerator>();
 
 
 var app = builder.Build();
@@ -46,8 +54,6 @@ app.UseHttpsRedirection();
 // app.UseAuthorization();
 
 app.MapControllers();
-
-
 
 
 var db = app.Services.CreateScope().ServiceProvider.GetRequiredService<DatabaseContext>();
