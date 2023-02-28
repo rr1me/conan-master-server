@@ -4,6 +4,7 @@ using conan_master_server.Models;
 using conan_master_server.Tickets;
 using conan_master_server.Tokens;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace conan_master_server.Controllers;
 
@@ -64,17 +65,20 @@ public class ConanController : ControllerBase
     }
 
     [HttpGet("/servers")]
-    public async Task<IActionResult> GetServers(Server server)
+    public IActionResult GetServers(Server server)
     {
         var s = _db.Servers.FirstOrDefault(x => x.Ip == server.Ip);
         if (s != null && !server.Equals(s))
         {
-            _db.Servers.Update(server);
+            _db.Entry(s).CurrentValues.SetValues(server);
         }
         else
         {
             _db.Servers.Add(server);
         }
+
+        if (s == null || _db.Entry(s).State != EntityState.Unchanged)
+            _db.SaveChanges();
         
         
         var r = new
