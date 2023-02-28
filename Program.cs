@@ -55,11 +55,9 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 
-
 var db = app.Services.CreateScope().ServiceProvider.GetRequiredService<DatabaseContext>();
 
 db.Database.EnsureCreated();
 db.SaveChanges();
-
 
 app.Run();
