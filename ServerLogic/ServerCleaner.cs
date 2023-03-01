@@ -10,7 +10,7 @@ public class ServerCleaner
     {
         while (true)
         {
-            var cutoff = DateTime.Now.AddMinutes(2);
+            var cutoff = DateTime.Now.AddMinutes(-2);
             var serversToDelete = _db.Servers.Where(s => s.LastPing < cutoff).ToList();
             _db.Servers.RemoveRange(serversToDelete);
             await _db.SaveChangesAsync();

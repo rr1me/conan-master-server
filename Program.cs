@@ -49,11 +49,10 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c=>c.SwaggerEndpoint("http://localhost:5221/swagger/v1/swagger.json", "conan-master-server v1"));
+    app.UseSwaggerUI(c=>c.SwaggerEndpoint("http://localhost:5030/swagger/v1/swagger.json", "conan-master-server v1"));
 }
 
 app.UseHttpsRedirection();
-
 // app.UseAuthorization();
 
 app.MapControllers();
