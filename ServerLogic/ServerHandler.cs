@@ -8,7 +8,6 @@ namespace conan_master_server.ServerLogic;
 
 public class ServerHandler
 {
-
     public DatabaseContext _db { get; set; }
 
     public async Task InitialHandler(string message)
@@ -16,12 +15,12 @@ public class ServerHandler
         var jObj = JObject.Parse(message);
 
         var id = jObj["serverAddress"];
-        // var port = jObj["port"];
         var sdObj = jObj["sessionDoc"] as JObject;
         sdObj.Add("id", id);
         
-        var server = JsonConvert.DeserializeObject<EbaniyServer>(sdObj.ToString());
-        Console.WriteLine(server.Id);
+        var server = JsonConvert.DeserializeObject<ServerEntity>(sdObj.ToString());
+        server.LastPing = DateTime.Now;
+        Console.WriteLine(server.LastPing);
         
         var s = _db.Servers.FirstOrDefault(x => x.Id == server.Id);
         if (s != null && !server.Equals(s))

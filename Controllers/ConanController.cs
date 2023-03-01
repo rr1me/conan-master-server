@@ -5,7 +5,6 @@ using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
 using conan_master_server.Tokens;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace conan_master_server.Controllers;
 
@@ -44,17 +43,47 @@ public class ConanController : ControllerBase
     }
 
     [HttpPost("token")]
-    public async Task<IActionResult> GetIdentityToken([FromBody] TokenRequest tokenRequest)
+    public IActionResult GetIdentityToken([FromBody] TokenRequest tokenRequest)
     {
+        var ticket = tokenRequest.SessionTicket;
+
+        var user = _db.Users.FirstOrDefault(x => x.Ticket == ticket);
+
+        if (user == null)
+            return BadRequest("No such user in db");
+
+        var r = _tokenGenerator.Generate(_randomGenerator);
+
+        user.Token = r.Token;
+        _db.SaveChanges();
+        
         _wrapper.data = new
         {
-            FunctionResult = _tokenGenerator.Generate()
+            FunctionResult = _tokenGenerator.Generate(_randomGenerator)
         };
         return Ok(_wrapper);
     }
 
-    [HttpPost("/cloud")]
-    public async Task<IActionResult> CloudScript()
+    [HttpPost("auth")]
+    public IActionResult Auth(TokenWrapped tokenWrapped)
+    {
+        var user = _db.Users.FirstOrDefault(x => x.Token == tokenWrapped.Token);
+
+        if (user == null)
+            return BadRequest("No such user in db");
+        
+        
+        return Ok(new
+        {
+            data = new
+            {
+                FunctionResult = _playerData.CreateTitleInfo(user, user.SpecId)
+            }
+        });
+    }
+
+    [HttpPost("cloud")]
+    public IActionResult CloudScript()
     {
         _wrapper.data = new
         {
@@ -69,86 +98,40 @@ public class ConanController : ControllerBase
         return Ok(_wrapper);
     }
 
-    // [HttpGet("/servers")]
-    // public IActionResult GetServers(Server server)
-    // {
-    //     var s = _db.Servers.FirstOrDefault(x => x.Ip == server.Ip);
-    //     if (s != null && !server.Equals(s))
-    //     {
-    //         _db.Entry(s).CurrentValues.SetValues(server);
-    //     }
-    //     else
-    //     {
-    //         _db.Servers.Add(server);
-    //     }
-    //
-    //     if (s == null || _db.Entry(s).State != EntityState.Unchanged)
-    //         _db.SaveChanges();
-    //
-    //
-    //     var r = new
-    //     {
-    //         sessions = new List<dynamic>
-    //         {
-    //             new
-    //             {
-    //                 S9 = "6_6_6",
-    //                 S8 = 0.0,
-    //                 S24 = 0.0,
-    //                 S119 = false,
-    //                 S117 = false,
-    //                 ip = server.Ip, //
-    //                 S0 = server.Pvp, //
-    //                 S7 = false,
-    //                 S6 = 0.0,
-    //                 Private = false,
-    //                 S4 = 0.0,
-    //                 S15 = 0,
-    //                 S18 = false,
-    //                 Sl = 0,
-    //                 buildId = 1654935032,
-    //                 S17 = "",
-    //                 S30 = 0,
-    //                 maxplayers = server.MaxPlayers, //
-    //                 kdsUri = "https://ce-kds-winunoff-ams05.funcom.com:7001/",
-    //                 Sz = 0,
-    //                 Sy = 0,
-    //                 serverUID = "436DD9864AC50173011009877349A33A",
-    //                 Name = server.Name, //
-    //                 S122 = false,
-    //                 S120 = "123",
-    //                 CSF = 1,
-    //                 Sw = 0,
-    //                 Su = 0,
-    //                 S22 = 0,
-    //                 S23 = 0,
-    //                 S21 = 0,
-    //                 So = 0,
-    //                 Sm = 0,
-    //                 S25 = false,
-    //                 Sa = false,
-    //                 Sg = 0,
-    //                 Sf = 0,
-    //                 MapName = server.MapName, //
-    //                 displayedmaxplayers = 10,
-    //                 Sj = 0,
-    //                 ss = 1024,
-    //                 queryPort = 28215,
-    //                 S05 = false,
-    //                 Sk = 0,
-    //                 EXTERNAL_SERVER_UID = "fac72328abc12cead5ddc71efa7f9d09",
-    //                 Guid = "CD63318B4522C1C91CF2F6BDFFF5AD16",
-    //                 Port = server.Port, //
-    //                 se = 9
-    //             }
-    //         }
-    //     };
-    //
-    //     return Ok(r);
-    // }
+    [HttpGet("servers")]
+    public IActionResult GetServers()
+    {
+        var servers = _db.Servers.ToList();
+        return Ok(new
+        {
+            sessions = servers
+        });
+    }
 
-    [HttpGet("/ws")]
-    public async Task Get()
+    [HttpGet("ping")]
+    public IActionResult Ping(string ip, int port)
+    {
+        var id = ip + ":" + port;
+        var server = _db.Servers.FirstOrDefault(x => x.Id == id);
+        
+        if (server == null)
+            return BadRequest(new
+            {
+                code = 400,
+                status = "No such server in db to ping"
+            });
+        
+        server.LastPing = DateTime.Now;
+        _db.SaveChanges();
+        return Ok(new
+        {
+            code = 200,
+            status = "OK"
+        });
+    }
+
+    [HttpGet("ws")]
+    public async Task GetWs()
     {
         _serverHandler._db = _db;
         await _socketHandler.Handle(HttpContext, _serverHandler.InitialHandler);

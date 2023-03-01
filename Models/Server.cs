@@ -2,59 +2,13 @@
 
 namespace conan_master_server.Models;
 
-// public class ServerTrash
-// {
-//     public decimal HungerRatio { get; set; }
-//     public decimal ItemConvertRatio { get; set; }
-//     public bool GameMode { get; set; }
-//     public bool LostItemsAfterDying { get; set; }
-//     public decimal DurabilityRatio { get; set; }
-//     public bool IsPrivate { get; set; }
-//     public decimal SlavingRatio { get; set; }
-//     public int UniquePlayers { get; set; }
-//     public bool IsVac { get; set; }
-//     public decimal YieldRatio { get; set; }
-//     public int BuildId { get; set; }
-//     public string Mods { get; set; }
-//     public int MaxPlayers { get; set; }
-//     public decimal ExpRatio { get; set; }
-//     public string ServerUID { get; set; }
-//     public string Name { get; set; }
-//     public bool CSF { get; set; }
-//     public int IncarnationTime { get; set; }
-//     public decimal ThirstRatio { get; set; }
-//     public decimal HungerRatioNonActive { get; set; }
-//     public decimal ThirstRatioNonActive { get; set; }
-//     public int AfkTime { get; set; }
-//     public decimal ResourceRecoveryRatio { get; set; }
-//     public bool RestrictBuildDamage { get; set; }
-//     public bool AllowToGetDiedPlayerItems { get; set; }
-//     public int TimeBetweenSunriseAndSunset { get; set; }
-//     public string MapName { get; set; }
-//     public int DisplayedMaxPlayers { get; set; }
-//     public decimal PowerWasteRatio { get; set; }
-//     public int MaxAllowedStringInChat { get; set; }
-//     public int QueryPort { get; set; }
-//     public bool BattleEye { get; set; }
-//     public decimal WastingFoodSpeed { get; set; }
-//     public int Port { get; set; }
-// }
-//
-// public class Server
-// {
-//     [Key]
-//     public string Ip { get; set; }
-//     public int MaxPlayers { get; set; }
-//     public string Name { get; set; }
-//     public string MapName { get; set; }
-//     public int Port { get; set; }
-//     public bool Pvp { get; set; }
-// }
-
-public class EbaniyServer
+public class ServerEntity
 {
     [Key]
     public string Id { get; set; }
+    public DateTime LastPing { get; set; }
+    
+    
     public string s9 { get; set; }
     public decimal s8 { get; set; }
     public decimal s24 { get; set; }

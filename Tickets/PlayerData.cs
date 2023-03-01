@@ -105,7 +105,7 @@ public class PlayerData
         };
     }
 
-    private TitleInfo CreateTitleInfo(ConanUser user, string titleId) =>
+    public TitleInfo CreateTitleInfo(ConanUser user, string titleId) =>
         new()
         {
             DisplayName = user.Username + titleId,

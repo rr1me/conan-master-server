@@ -17,7 +17,6 @@ builder.Services.AddDbContext<DatabaseContext>(x =>
     x.UseMySql(connectionString, serverVersion);
 });
 
-
 builder.Services.AddControllers(options =>
 {
     options.ModelBinderProviders.Insert(0, new CustomModelBinderProvider());
@@ -27,6 +26,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddTransient<ServerCleaner>();
 builder.Services.AddSingleton<ServerHandler>();
 builder.Services.AddSingleton<SocketHandler>();
 builder.Services.AddTransient<RandomGenerator>();
@@ -64,9 +64,16 @@ var webSocketOptions = new WebSocketOptions
 
 app.UseWebSockets(webSocketOptions);
 
-var db = app.Services.CreateScope().ServiceProvider.GetRequiredService<DatabaseContext>();
+var scope = app.Services.CreateScope();
+var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
 db.Database.EnsureCreated();
 db.SaveChanges();
+
+var cleaner = scope.ServiceProvider.GetRequiredService<ServerCleaner>();
+cleaner._db = db;
+Task.Run(cleaner.Cleanup);
+
+
 
 app.Run();

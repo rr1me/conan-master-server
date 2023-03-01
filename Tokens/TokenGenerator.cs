@@ -1,18 +1,20 @@
-﻿namespace conan_master_server.Tokens;
+﻿using conan_master_server.Additional;
+
+namespace conan_master_server.Tokens;
 
 public class TokenGenerator
 {
-    public TokenResponse Generate()
+    public TokenWrapped Generate(RandomGenerator generator)
     {
-        return new TokenResponse
+        return new TokenWrapped
         {
-            Token = "token",
-            Counter = "Counter"
+            Token = generator.GenerateToken(),
+            Counter = generator.GenerateCounter()
         };
     }
 }
 
-public class TokenResponse
+public class TokenWrapped
 {
     public string Token { get; set; }
     public string Counter { get; set; }
