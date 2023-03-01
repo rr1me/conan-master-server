@@ -1,6 +1,7 @@
 using conan_master_server.Additional;
 using conan_master_server.Data;
 using conan_master_server.ModelBinder;
+using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
 using conan_master_server.Tokens;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -26,6 +27,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddSingleton<ServerHandler>();
+builder.Services.AddSingleton<SocketHandler>();
 builder.Services.AddTransient<RandomGenerator>();
 builder.Services.AddScoped<ResponseWrapper>();
 
@@ -54,6 +57,12 @@ app.UseHttpsRedirection();
 // app.UseAuthorization();
 
 app.MapControllers();
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+
+app.UseWebSockets(webSocketOptions);
 
 var db = app.Services.CreateScope().ServiceProvider.GetRequiredService<DatabaseContext>();
 
