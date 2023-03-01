@@ -15,11 +15,12 @@ public class ServerHandler
     {
         var jObj = JObject.Parse(message);
 
-        var ip = jObj["ip"];
-        var port = jObj["port"];
-        jObj.Add("Id", ip + port.ToString());
+        var id = jObj["serverAddress"];
+        // var port = jObj["port"];
+        var sdObj = jObj["sessionDoc"] as JObject;
+        sdObj.Add("id", id);
         
-        var server = JsonConvert.DeserializeObject<EbaniyServer>(jObj.ToString());
+        var server = JsonConvert.DeserializeObject<EbaniyServer>(sdObj.ToString());
         Console.WriteLine(server.Id);
         
         var s = _db.Servers.FirstOrDefault(x => x.Id == server.Id);

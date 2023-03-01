@@ -70,7 +70,7 @@ public class EbaniyServer
     public bool s18 { get; set; }
     public decimal sl { get; set; }
     public int buildId { get; set; }
-    public string s17 { get; set; }
+    public string? s17 { get; set; }
     public decimal s30 { get; set; }
     public int maxplayers { get; set; }
     public string kdsUri { get; set; }
@@ -81,7 +81,7 @@ public class EbaniyServer
     public bool s122 { get; set; }
     public string s120 { get; set; }
     public bool csf { get; set; }
-    public string sw { get; set; }
+    public string? sw { get; set; }
     public string su { get; set; }
     public decimal s22 { get; set; }
     public decimal s23 { get; set; }
