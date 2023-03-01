@@ -59,7 +59,7 @@ public class ConanController : ControllerBase
         
         _wrapper.data = new
         {
-            FunctionResult = _tokenGenerator.Generate(_randomGenerator)
+            FunctionResult = r
         };
         return Ok(_wrapper);
     }
