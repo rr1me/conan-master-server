@@ -20,7 +20,8 @@ public class ConanController : ControllerBase
     private readonly ServerHandler _serverHandler;
 
     public ConanController(PlayerData playerData, RequestHandler requestHandler, DatabaseContext db,
-        RandomGenerator randomGenerator, ResponseWrapper wrapper, TokenGenerator tokenGenerator, SocketHandler socketHandler, ServerHandler serverHandler)
+        RandomGenerator randomGenerator, ResponseWrapper wrapper, TokenGenerator tokenGenerator,
+        SocketHandler socketHandler, ServerHandler serverHandler)
     {
         _playerData = playerData;
         _requestHandler = requestHandler;
@@ -35,10 +36,7 @@ public class ConanController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AuthTicket authTicket)
     {
-        var steamResponse = await _requestHandler.AuthUserTicket(authTicket.SteamTicket);
-
-        _wrapper.data = await _playerData.Generate(steamResponse.SteamId, authTicket.TitleId, _db, HttpContext,
-            _randomGenerator);
+        _wrapper.data = await _playerData.Generate(authTicket, _db, HttpContext, _randomGenerator);
         return Ok(_wrapper);
     }
 
@@ -52,34 +50,31 @@ public class ConanController : ControllerBase
         if (user == null)
             return BadRequest("No such user in db");
 
-        var r = _tokenGenerator.Generate(_randomGenerator);
-
-        user.Token = r.Token;
-        _db.SaveChanges();
-        
         _wrapper.data = new
         {
-            FunctionResult = r
+            FunctionResult = new TokenWrapped
+            {
+                Token = user.Token,
+                Counter = _randomGenerator.GenerateCounter()
+            }
         };
         return Ok(_wrapper);
     }
 
     [HttpPost("auth")]
-    public IActionResult Auth(TokenWrapped tokenWrapped)
+    public IActionResult Auth([FromBody] TokenWrapped tokenWrapped)
     {
         var user = _db.Users.FirstOrDefault(x => x.Token == tokenWrapped.Token);
 
         if (user == null)
             return BadRequest("No such user in db");
-        
-        
-        return Ok(new
+
+        _wrapper.data = new
         {
-            data = new
-            {
-                FunctionResult = _playerData.CreateTitleInfo(user, user.SpecId)
-            }
-        });
+            FunctionResult = _playerData.CreateTitleInfo(user)
+        };
+
+        return Ok(_wrapper);
     }
 
     [HttpPost("cloud")]
@@ -113,21 +108,13 @@ public class ConanController : ControllerBase
     {
         var id = ip + ":" + port;
         var server = _db.Servers.FirstOrDefault(x => x.Id == id);
-        
+
         if (server == null)
-            return BadRequest(new
-            {
-                code = 400,
-                status = "No such server in db to ping"
-            });
-        
+            return BadRequest("No such server in db to ping");
+
         server.LastPing = DateTime.Now;
         _db.SaveChanges();
-        return Ok(new
-        {
-            code = 200,
-            status = "OK"
-        });
+        return Ok();
     }
 
     [HttpGet("ws")]

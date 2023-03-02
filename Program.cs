@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddDbContext<DatabaseContext>(x =>
 {
     var connectionString = builder.Configuration.GetSection("ConnectionString").Value;
@@ -39,6 +38,12 @@ builder.Services.AddSingleton<PlayerData>();
 builder.Services.AddSingleton<TokenGenerator>();
 
 
+builder.Services.AddTransient<TreatmentAssignment>();
+builder.Services.AddTransient<InfoResultPayload>();
+builder.Services.AddTransient<SettingsForUser>();
+builder.Services.AddTransient<LoginData>();
+
+
 var app = builder.Build();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -49,11 +54,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c=>c.SwaggerEndpoint("http://localhost:5030/swagger/v1/swagger.json", "conan-master-server v1"));
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("http://localhost:5030/swagger/v1/swagger.json", "conan-master-server v1"));
 }
-
-app.UseHttpsRedirection();
-// app.UseAuthorization();
 
 app.MapControllers();
 var webSocketOptions = new WebSocketOptions
@@ -64,15 +66,8 @@ var webSocketOptions = new WebSocketOptions
 app.UseWebSockets(webSocketOptions);
 
 var scope = app.Services.CreateScope();
-var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-
-db.Database.EnsureCreated();
-db.SaveChanges();
-
 var cleaner = scope.ServiceProvider.GetRequiredService<ServerCleaner>();
-cleaner._db = db;
+cleaner.Scope = scope;
 Task.Run(cleaner.Cleanup);
-
-
 
 app.Run();

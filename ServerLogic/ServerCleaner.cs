@@ -4,16 +4,20 @@ namespace conan_master_server.ServerLogic;
 
 public class ServerCleaner
 {
-    public DatabaseContext _db { get; set; }
+    public IServiceScope Scope { get; set; }
 
     public async Task Cleanup()
     {
+        var db = Scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+        await db.Database.EnsureCreatedAsync();
+        await db.SaveChangesAsync();
+
         while (true)
         {
             var cutoff = DateTime.Now.AddMinutes(-2);
-            var serversToDelete = _db.Servers.Where(s => s.LastPing < cutoff).ToList();
-            _db.Servers.RemoveRange(serversToDelete);
-            await _db.SaveChangesAsync();
+            var serversToDelete = db.Servers.Where(s => s.LastPing < cutoff).ToList();
+            db.Servers.RemoveRange(serversToDelete);
+            await db.SaveChangesAsync();
             await Task.Delay(TimeSpan.FromMinutes(2));
         }
     }
