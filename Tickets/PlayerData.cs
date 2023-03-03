@@ -58,7 +58,7 @@ public class PlayerData
             user.PublisherId,
             TitleId = titleId,
             PlayerId = user.PlayfabId,
-            DisplayName = user.Username + titleId
+            DisplayName = user.Username + randomGenerator.Generate5()
         };
         _loginData.EntityToken = new
         {
@@ -69,9 +69,8 @@ public class PlayerData
         return _loginData;
     }
 
-    private object GetAccountInfo(ConanUser user, SteamPlayerInfo accountInfo)
-    {
-        return new
+    private object GetAccountInfo(ConanUser user, SteamPlayerInfo accountInfo) =>
+        new
         {
             PlayFabId = user.PlayfabId,
             Created = user.CreationDate,
@@ -85,5 +84,4 @@ public class PlayerData
                 SteamCurrency = "RUB"
             }
         };
-    }
 }
