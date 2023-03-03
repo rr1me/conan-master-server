@@ -23,8 +23,11 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddLogging(x => x.AddFile("app.log"));
+
 builder.Services.AddHttpClient();
 
+builder.Services.AddSingleton<CleanerOrchestrator>();
 builder.Services.AddTransient<ServerCleaner>();
 builder.Services.AddSingleton<ServerHandler>();
 builder.Services.AddSingleton<SocketHandler>();
@@ -58,16 +61,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+
 var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(2)
 };
-
 app.UseWebSockets(webSocketOptions);
 
 var scope = app.Services.CreateScope();
-var cleaner = scope.ServiceProvider.GetRequiredService<ServerCleaner>();
-cleaner.Scope = scope;
-Task.Run(cleaner.Cleanup);
+var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+db.Database.EnsureCreated();
+db.SaveChanges();
 
 app.Run();

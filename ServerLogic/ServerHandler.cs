@@ -12,15 +12,23 @@ public class ServerHandler
 
     public async Task InitialHandler(string message)
     {
-        var jObj = JObject.Parse(message);
+        ServerEntity server;
+        try
+        {
+            var jObj = JObject.Parse(message);
 
-        var id = jObj["serverAddress"];
-        var sdObj = jObj["sessionDoc"] as JObject;
-        sdObj.Add("id", id);
+            var id = jObj["serverAddress"];
+            var sdObj = jObj["sessionDoc"] as JObject;
+            sdObj.Add("id", id);
+
+            server = JsonConvert.DeserializeObject<ServerEntity>(sdObj.ToString());
+        }
+        catch (Exception e)
+        {
+            throw new JsonException("Probably no suitable entity for deserialization. Exact error: "+e.Message);
+        }
         
-        var server = JsonConvert.DeserializeObject<ServerEntity>(sdObj.ToString());
         server.LastPing = DateTime.Now;
-        Console.WriteLine(server.LastPing);
         
         var s = _db.Servers.FirstOrDefault(x => x.Id == server.Id);
         if (s != null && !server.Equals(s))

@@ -51,6 +51,10 @@ public class RequestHandler
         var responseString = await r.Content.ReadAsStringAsync();
 
         var jToken = JObject.Parse(responseString)["response"].First.First;
+
+        if (jToken.Count() == 2)
+            throw new ArgumentException("Invalid steam ticket");
+        
         var json = jToken.Type == JTokenType.Array ? jToken.First.ToString() : jToken.ToString();
 
         return JsonConvert.DeserializeObject<T>(json);

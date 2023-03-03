@@ -19,10 +19,8 @@ public class PlayerData
         _loginData = loginData;
     }
 
-    private readonly object stubObj = new { };
-    private readonly IList<object> stubList = new List<object>();
-
-    public async Task<LoginData> Generate(AuthTicket authTicket, DatabaseContext db, HttpContext httpContext, RandomGenerator randomGenerator)
+    public async Task<LoginData> Generate(AuthTicket authTicket, DatabaseContext db, HttpContext httpContext,
+        RandomGenerator randomGenerator)
     {
         var titleId = authTicket.TitleId;
         var steamResponse = await _requestHandler.AuthUserTicket(authTicket.SteamTicket);
@@ -69,48 +67,6 @@ public class PlayerData
             Entity = CreateTitle(user.EntityId)
         };
         return _loginData;
-
-
-        // return new
-        // {
-        //     SessionTicket = user.Ticket,
-        //     PlayFabId = user.PlayfabId,
-        //     NewlyCreated = false,
-        //     SettingsForUser = new
-        //     {
-        //         NeedsAttribution = false,
-        //         GatherDeviceInfo = true,
-        //         GatherFocusInfo = true
-        //     },
-        //     LastLoginTime = DateTime.UtcNow,
-        //     InfoResultPayload = new
-        //     {
-        //         AccountInfo = GetAccountInfo(user, accountInfo),
-        //         UserInventory = stubList,
-        //         UserData = stubObj,
-        //         UserDataVersion = 149,
-        //         UserReadOnlyDataVersion = 0,
-        //         CharacterInventories = stubList,
-        //         PlayerProfile = new
-        //         {
-        //             user.PublisherId,
-        //             TitleId = titleId,
-        //             PlayerId = user.PlayfabId,
-        //             DisplayName = user.Username + titleId
-        //         }
-        //     },
-        //     EntityToken = new
-        //     {
-        //         EntityToken = "token",
-        //         TokenExpiration = "when",
-        //         Entity = CreateTitle(user.EntityId)
-        //     },
-        //     TreatmentAssignment = new
-        //     {
-        //         Variants = stubList,
-        //         Variables = stubList
-        //     }
-        // };
     }
 
     private object GetAccountInfo(ConanUser user, SteamPlayerInfo accountInfo)
@@ -120,7 +76,7 @@ public class PlayerData
             PlayFabId = user.PlayfabId,
             Created = user.CreationDate,
             TitleInfo = CreateTitleInfo(user),
-            PrivateInfo = stubObj,
+            PrivateInfo = new { },
             SteamInfo = new
             {
                 user.SteamId,

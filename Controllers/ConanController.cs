@@ -11,26 +11,23 @@ namespace conan_master_server.Controllers;
 public class ConanController : ControllerBase
 {
     private readonly PlayerData _playerData;
-    private readonly RequestHandler _requestHandler;
     private readonly DatabaseContext _db;
     private readonly RandomGenerator _randomGenerator;
     private readonly ResponseWrapper _wrapper;
-    private readonly TokenGenerator _tokenGenerator;
     private readonly SocketHandler _socketHandler;
     private readonly ServerHandler _serverHandler;
+    private readonly CleanerOrchestrator _cleanerOrchestrator;
 
-    public ConanController(PlayerData playerData, RequestHandler requestHandler, DatabaseContext db,
-        RandomGenerator randomGenerator, ResponseWrapper wrapper, TokenGenerator tokenGenerator,
-        SocketHandler socketHandler, ServerHandler serverHandler)
+    public ConanController(PlayerData playerData, DatabaseContext db, RandomGenerator randomGenerator,
+        ResponseWrapper wrapper, SocketHandler socketHandler, ServerHandler serverHandler, CleanerOrchestrator cleanerOrchestrator)
     {
         _playerData = playerData;
-        _requestHandler = requestHandler;
         _db = db;
         _randomGenerator = randomGenerator;
         _wrapper = wrapper;
-        _tokenGenerator = tokenGenerator;
         _socketHandler = socketHandler;
         _serverHandler = serverHandler;
+        _cleanerOrchestrator = cleanerOrchestrator;
     }
 
     [HttpPost("login")]
@@ -122,5 +119,6 @@ public class ConanController : ControllerBase
     {
         _serverHandler._db = _db;
         await _socketHandler.Handle(HttpContext, _serverHandler.InitialHandler);
+        _cleanerOrchestrator.Run();
     }
 }
