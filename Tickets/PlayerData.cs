@@ -64,7 +64,7 @@ public class PlayerData
         {
             EntityToken = "token",
             TokenExpiration = "when",
-            Entity = CreateTitle(user.EntityId)
+            Entity = new TitlePlayerAccount(user.EntityId)
         };
         return _loginData;
     }
@@ -75,7 +75,7 @@ public class PlayerData
         {
             PlayFabId = user.PlayfabId,
             Created = user.CreationDate,
-            TitleInfo = CreateTitleInfo(user),
+            TitleInfo = new TitleInfo(user),
             PrivateInfo = new { },
             SteamInfo = new
             {
@@ -86,21 +86,4 @@ public class PlayerData
             }
         };
     }
-
-    public TitleInfo CreateTitleInfo(ConanUser user) =>
-        new()
-        {
-            DisplayName = user.Username + user.SpecId,
-            Created = user.CreationDate,
-            LastLogin = DateTime.UtcNow,
-            FirstLogin = user.CreationDate,
-            IsBanned = false,
-            TitlePlayerAccount = CreateTitle(user.EntityId)
-        };
-
-    private TitlePlayerAccount CreateTitle(string entityId) =>
-        new()
-        {
-            Id = entityId,
-        };
 }

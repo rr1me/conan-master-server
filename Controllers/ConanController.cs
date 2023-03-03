@@ -64,7 +64,7 @@ public class ConanController : ControllerBase
         if (user == null)
             return BadRequest("No such user in db");
 
-        _wrapper.data = new funcWrap(_playerData.CreateTitleInfo(user));
+        _wrapper.data = new funcWrap(new TitleInfo(user));
 
         return Ok(_wrapper);
     }
