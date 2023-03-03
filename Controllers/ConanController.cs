@@ -1,5 +1,6 @@
 ﻿using conan_master_server.Additional;
 using conan_master_server.Data;
+using conan_master_server.Entities;
 using conan_master_server.Models;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
@@ -47,14 +48,11 @@ public class ConanController : ControllerBase
         if (user == null)
             return BadRequest("No such user in db");
 
-        _wrapper.data = new
+        _wrapper.data = new funcWrap(new TokenWrapped
         {
-            FunctionResult = new TokenWrapped
-            {
-                Token = user.Token,
-                Counter = _randomGenerator.GenerateCounter()
-            }
-        };
+            Token = user.Token,
+            Counter = _randomGenerator.GenerateCounter()
+        });
         return Ok(_wrapper);
     }
 
@@ -66,10 +64,7 @@ public class ConanController : ControllerBase
         if (user == null)
             return BadRequest("No such user in db");
 
-        _wrapper.data = new
-        {
-            FunctionResult = _playerData.CreateTitleInfo(user)
-        };
+        _wrapper.data = new funcWrap(_playerData.CreateTitleInfo(user));
 
         return Ok(_wrapper);
     }
@@ -77,15 +72,7 @@ public class ConanController : ControllerBase
     [HttpPost("cloud")]
     public IActionResult CloudScript()
     {
-        _wrapper.data = new
-        {
-            FunctionResult = new
-            {
-                IsPlayerBanned = false,
-                ChargebackAdjustedVirtualCurrencies = new { },
-                BannedNegativeVirtualCurrencies = new { }
-            }
-        };
+        _wrapper.data = new funcWrap(new cloudResp());
 
         return Ok(_wrapper);
     }
@@ -94,10 +81,7 @@ public class ConanController : ControllerBase
     public IActionResult GetServers()
     {
         var servers = _db.Servers.ToList();
-        return Ok(new
-        {
-            sessions = servers
-        });
+        return Ok(new sessions(servers));
     }
 
     [HttpGet("ping")]
@@ -120,5 +104,32 @@ public class ConanController : ControllerBase
         _serverHandler._db = _db;
         await _socketHandler.Handle(HttpContext, _serverHandler.InitialHandler);
         _cleanerOrchestrator.Run();
+    }
+}
+
+class funcWrap
+{
+    public object FunctionResult { get; }
+
+    public funcWrap(object functionResult)
+    {
+        FunctionResult = functionResult;
+    }
+}
+
+class cloudResp
+{
+    public bool IsPlayerBanned { get; } = false;
+    public object ChargebackAdjustedVirtualCurrencies { get; } = new { };
+    public object BannedNegativeVirtualCurrencies { get; } = new { };
+}
+
+class sessions
+{
+    public List<ServerEntity> Sessions { get; }
+
+    public sessions(List<ServerEntity> sessions)
+    {
+        Sessions = sessions;
     }
 }
