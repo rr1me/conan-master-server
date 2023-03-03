@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace conan_master_server.Models;
+namespace conan_master_server.Entities;
 
 public class ServerEntity
 {
     [Key]
     public string Id { get; set; }
     public DateTime LastPing { get; set; }
-    
-    
+
     public string s9 { get; set; }
     public decimal s8 { get; set; }
     public decimal s24 { get; set; }

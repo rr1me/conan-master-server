@@ -9,11 +9,8 @@ public class ConanUser
     [Key]
     public long Id { get; set; }
     public long SteamId { get; set; }
-    // public string Avatar { get; set; }
     public string EntityId { get; set; }
-    // public int Id { get; set; }
     public string Ip { get; set; }
-    // public int LoginCount { get; set; }
     public string PlayfabId { get; set; }
     public string PublisherId { get; set; }
     public string SpecId { get; set; }

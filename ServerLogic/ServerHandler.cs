@@ -1,5 +1,5 @@
 ﻿using conan_master_server.Data;
-using conan_master_server.Models;
+using conan_master_server.Entities;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
