@@ -53,6 +53,8 @@ public class ConanController : ControllerBase
         });
         return Ok(_wrapper);
     }
+    
+    private object NullProp { get; }
 
     [HttpPost("auth")]
     public IActionResult Auth([FromBody] TokenWrapped tokenWrapped)
@@ -62,7 +64,7 @@ public class ConanController : ControllerBase
         if (user == null)
             return BadRequest("No such user in db");
 
-        _wrapper.data = new funcWrap(new TitleInfo(user));
+        _wrapper.data = new funcWrap(new AuthResponse(user));
         return Ok(_wrapper);
     }
 

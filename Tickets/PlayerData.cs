@@ -42,7 +42,8 @@ public class PlayerData
                 Ticket = ticketObject.SessionTicket,
                 Token = randomGenerator.GenerateToken(), //?
                 Username = accountInfo.PersonaName, //?
-                CreationDate = DateTime.UtcNow
+                CreationDate = DateTime.UtcNow,
+                Identifier = randomGenerator.Generate5()
             };
 
             db.Users.Add(user);
@@ -53,7 +54,7 @@ public class PlayerData
         _loginData.PlayFabId = user.PlayfabId;
         var irp = _loginData.InfoResultPayload;
         irp.AccountInfo = new AccountInfo(user, accountInfo);
-        irp.PlayerProfile = new PlayerProfile(user, randomGenerator.Generate5());
+        irp.PlayerProfile = new PlayerProfile(user);
         _loginData.EntityToken = new EntityTokenWrapper(new TitlePlayerAccount(user.EntityId));
         return _loginData;
     }

@@ -15,18 +15,18 @@ public class RandomGenerator
         "!@$?_-"
     };
 
-    public string Generate5() => Generate(5).ToUpper();
+    public int Generate5() => int.Parse(Generate(5, true));
     public string Generate16() => Generate(16).ToUpper();
     public string GenerateEnd() => Generate(43) + "=";
     public string GenerateToken() => Generate(314);
     public string GenerateCounter() => Generate(32);
 
-    private string Generate(int symbolCount)
+    private string Generate(int symbolCount, bool onlyDigits = false)
     {
         var chars = new List<char>();
         for (var i = 0; i < symbolCount; i++)
         {
-            var row = _rand.Next(0, 3); //3 = no !@$?_- symbols
+            var row = onlyDigits ? 2 : _rand.Next(0, 3); //3 = no !@$?_- symbols
             chars.Add(_randomChars[row][_rand.Next(0, _randomChars[row].Length)]);
         }
 

@@ -95,12 +95,12 @@ public class PlayerProfile
     public string PlayerId { get; }
     public string DisplayName { get; }
 
-    public PlayerProfile(ConanUser user, string identifier)
+    public PlayerProfile(ConanUser user)
     {
         PublisherId = user.PublisherId;
         TitleId = user.SpecId;
         PlayerId = user.PlayfabId;
-        DisplayName = user.Username + identifier;
+        DisplayName = user.Username + user.Identifier;
     }
 }
 
@@ -120,4 +120,39 @@ public class TokenWrapped
 {
     public string Token { get; set; }
     public string Counter { get; set; }
+}
+
+public class AuthResponse
+{
+    public string PlayFabId { get; }
+    public TitleInfo TitleInfo { get; }
+    public string STEAM { get; }
+    public List<Entitlement> Entitlements { get; }
+    public bool IsBanned => false;
+
+    public AuthResponse(ConanUser user)
+    {
+        PlayFabId = user.PlayfabId;
+        TitleInfo = new TitleInfo(user);
+        STEAM = user.SteamId.ToString();
+        Entitlements = new List<Entitlement>
+        {
+            new()
+            {
+                Id = "MAIN_TITLE_STAGING",
+                Name = "MAIN_TITLE_STAGING"
+            },
+            new()
+            {
+                Id = "MAIN_TITLE",
+                Name = "MAIN_TITLE"
+            }
+        };
+    }
+}
+
+public class Entitlement
+{
+    public string Id { get; init; }
+    public string Name { get; init; }
 }

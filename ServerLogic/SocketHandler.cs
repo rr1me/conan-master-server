@@ -23,8 +23,8 @@ public class SocketHandler
         var buffer = new byte[1024 * 4];
         var receiveResult = await webSocket.ReceiveAsync(
             new ArraySegment<byte>(buffer), CancellationToken.None);
-        // while (!receiveResult.CloseStatus.HasValue)
-        // {
+        while (!receiveResult.CloseStatus.HasValue)
+        {
             var message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
             await callback(message);
             
@@ -34,9 +34,9 @@ public class SocketHandler
                 receiveResult.EndOfMessage,
                 CancellationToken.None);
 
-        //     receiveResult = await webSocket.ReceiveAsync(
-        //         new ArraySegment<byte>(buffer), CancellationToken.None);
-        // }
+            receiveResult = await webSocket.ReceiveAsync(
+                new ArraySegment<byte>(buffer), CancellationToken.None);
+        }
 
         await webSocket.CloseAsync(
             receiveResult.CloseStatus.Value,

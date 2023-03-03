@@ -19,4 +19,5 @@ public class ConanUser
     public string Username { get; set; }
     
     public DateTime CreationDate { get; set; }
+    public int Identifier { get; set; }
 }
