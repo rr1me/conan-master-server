@@ -8,9 +8,7 @@ namespace conan_master_server.ServerLogic;
 
 public class ServerHandler
 {
-    public DatabaseContext _db { get; set; }
-
-    public async Task InitialHandler(string message)
+    public async Task InitialHandler(string message, DatabaseContext db)
     {
         ServerEntity server;
         try
@@ -30,17 +28,17 @@ public class ServerHandler
         
         server.LastPing = DateTime.Now;
         
-        var s = _db.Servers.FirstOrDefault(x => x.Id == server.Id);
+        var s = db.Servers.FirstOrDefault(x => x.Id == server.Id);
         if (s != null && !server.Equals(s))
         {
-            _db.Entry(s).CurrentValues.SetValues(server);
+            db.Entry(s).CurrentValues.SetValues(server);
         }
         else
         {
-            _db.Servers.Add(server);
+            db.Servers.Add(server);
         }
         
-        if (s == null || _db.Entry(s).State != EntityState.Unchanged)
-            await _db.SaveChangesAsync();
+        if (s == null || db.Entry(s).State != EntityState.Unchanged)
+            await db.SaveChangesAsync();
     }
 }

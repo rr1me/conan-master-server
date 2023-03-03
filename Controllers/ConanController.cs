@@ -1,6 +1,5 @@
 ﻿using conan_master_server.Additional;
 using conan_master_server.Data;
-using conan_master_server.Entities;
 using conan_master_server.Models;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
@@ -101,8 +100,7 @@ public class ConanController : ControllerBase
     [HttpGet("ws")]
     public async Task GetWs()
     {
-        _serverHandler._db = _db;
-        await _socketHandler.Handle(HttpContext, _serverHandler.InitialHandler);
+        await _socketHandler.Handle(HttpContext, x => _serverHandler.InitialHandler(x, _db));
         _cleanerOrchestrator.Run();
     }
 }
