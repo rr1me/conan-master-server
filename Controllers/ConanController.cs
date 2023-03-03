@@ -53,8 +53,6 @@ public class ConanController : ControllerBase
         });
         return Ok(_wrapper);
     }
-    
-    private object NullProp { get; }
 
     [HttpPost("auth")]
     public IActionResult Auth([FromBody] TokenWrapped tokenWrapped)

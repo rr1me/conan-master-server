@@ -23,7 +23,7 @@ public class RequestHandler
     {
         var param = new Dictionary<string, string>
         {
-            {"appid", "440900"},
+            {"appid", "480"},
             {"key", KEY},
             {"ticket", steamTicket}
         };

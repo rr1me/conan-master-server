@@ -34,8 +34,15 @@ public class SocketHandler
                 receiveResult.EndOfMessage,
                 CancellationToken.None);
 
-            receiveResult = await webSocket.ReceiveAsync(
-                new ArraySegment<byte>(buffer), CancellationToken.None);
+            try
+            {
+                receiveResult = await webSocket.ReceiveAsync(
+                    new ArraySegment<byte>(buffer), CancellationToken.None);
+            }
+            catch (WebSocketException e)
+            {
+                Console.WriteLine("Probably the remote party closed ws connection like -9. Exact error: " + e.Message);
+            }
         }
 
         await webSocket.CloseAsync(
