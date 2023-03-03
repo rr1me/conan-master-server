@@ -1,4 +1,7 @@
-﻿namespace conan_master_server.Tickets;
+﻿using conan_master_server.Entities;
+using conan_master_server.Models;
+
+namespace conan_master_server.Tickets;
 
 public class LoginData
 {
@@ -7,7 +10,7 @@ public class LoginData
     public string SessionTicket { get; set; }
     public string PlayFabId { get; set; }
 
-    public bool NewlyCreated { get; } = false;
+    public bool NewlyCreated => false;
     public SettingsForUser SettingsForUser { get; }
     public DateTime LastLoginTime { get; } = DateTime.Now;
     public InfoResultPayload InfoResultPayload { get; }
@@ -31,9 +34,9 @@ public class LoginData
 
 public class SettingsForUser
 {
-    public bool NeedsAttribution { get; } = false;
-    public bool GatherDeviceInfo { get; } = true;
-    public bool GatherFocusInfo { get; } = true;
+    public bool NeedsAttribution => false;
+    public bool GatherDeviceInfo => true;
+    public bool GatherFocusInfo => true;
 }
 
 public class InfoResultPayload
@@ -41,8 +44,8 @@ public class InfoResultPayload
     public object AccountInfo { get; set; }
     public IList<object> UserInventory { get; set; }
     public object UserData { get; set; }
-    public int UserDataVersion { get; } = 149;
-    public int UserReadOnlyDataVersion { get; } = 0;
+    public int UserDataVersion => 149;
+    public int UserReadOnlyDataVersion => 0;
     public IList<object> CharacterInventories { get; set; }
     public object PlayerProfile { get; set; }
 }
@@ -51,4 +54,64 @@ public class TreatmentAssignment
 {
     public IList<object> Variants { get; set; }
     public IList<object> Variables { get; set; }
+}
+
+public class AccountInfo
+{
+    public string PlayFabId { get; }
+    public DateTime Created { get; }
+    public TitleInfo TitleInfo { get; }
+    public object PrivateInfo { get; } = new { };
+    public SteamInfo SteamInfo { get; }
+
+    public AccountInfo(ConanUser user, SteamPlayerInfo info)
+    {
+        PlayFabId = user.PlayfabId;
+        Created = user.CreationDate;
+        TitleInfo = new TitleInfo(user);
+        SteamInfo = new SteamInfo(user, info);
+    }
+}
+
+public class SteamInfo
+{
+    public long SteamId { get; }
+    public string SteamName { get; }
+    public string SteamCountry { get; }
+    public string SteamCurrency => "RUB";
+
+    public SteamInfo(ConanUser user, SteamPlayerInfo info)
+    {
+        SteamId = user.SteamId;
+        SteamName = info.PersonaName;
+        SteamCountry = info.LocCountryCode;
+    }
+}
+
+public class PlayerProfile
+{
+    public string PublisherId { get; }
+    public string TitleId { get; }
+    public string PlayerId { get; }
+    public string DisplayName { get; }
+
+    public PlayerProfile(ConanUser user, string identifier)
+    {
+        PublisherId = user.PublisherId;
+        TitleId = user.SpecId;
+        PlayerId = user.PlayfabId;
+        DisplayName = user.Username + identifier;
+    }
+}
+
+public class EntityTokenWrapper
+{
+    public string EntityToken => "Unknown field";
+    public string TokenExpiration => "Unknown field";
+    public TitlePlayerAccount Entity { get; }
+
+    public EntityTokenWrapper(TitlePlayerAccount entity)
+    {
+        Entity = entity;
+    }
 }

@@ -52,36 +52,9 @@ public class PlayerData
         _loginData.SessionTicket = user.Ticket;
         _loginData.PlayFabId = user.PlayfabId;
         var irp = _loginData.InfoResultPayload;
-        irp.AccountInfo = GetAccountInfo(user, accountInfo);
-        irp.PlayerProfile = new
-        {
-            user.PublisherId,
-            TitleId = titleId,
-            PlayerId = user.PlayfabId,
-            DisplayName = user.Username + randomGenerator.Generate5()
-        };
-        _loginData.EntityToken = new
-        {
-            EntityToken = "token",
-            TokenExpiration = "when",
-            Entity = new TitlePlayerAccount(user.EntityId)
-        };
+        irp.AccountInfo = new AccountInfo(user, accountInfo);
+        irp.PlayerProfile = new PlayerProfile(user, randomGenerator.Generate5());
+        _loginData.EntityToken = new EntityTokenWrapper(new TitlePlayerAccount(user.EntityId));
         return _loginData;
     }
-
-    private object GetAccountInfo(ConanUser user, SteamPlayerInfo accountInfo) =>
-        new
-        {
-            PlayFabId = user.PlayfabId,
-            Created = user.CreationDate,
-            TitleInfo = new TitleInfo(user),
-            PrivateInfo = new { },
-            SteamInfo = new
-            {
-                user.SteamId,
-                SteamName = accountInfo.PersonaName,
-                SteamCountry = accountInfo.LocCountryCode,
-                SteamCurrency = "RUB"
-            }
-        };
 }
