@@ -43,7 +43,6 @@ builder.Services.AddTransient<InfoResultPayload>();
 builder.Services.AddTransient<SettingsForUser>();
 builder.Services.AddTransient<LoginData>();
 
-
 var app = builder.Build();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions

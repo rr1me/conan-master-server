@@ -15,10 +15,9 @@ public class ConanController : ControllerBase
     private readonly ResponseWrapper _wrapper;
     private readonly SocketHandler _socketHandler;
     private readonly ServerHandler _serverHandler;
-    private readonly CleanerOrchestrator _cleanerOrchestrator;
 
     public ConanController(PlayerData playerData, DatabaseContext db, RandomGenerator randomGenerator,
-        ResponseWrapper wrapper, SocketHandler socketHandler, ServerHandler serverHandler, CleanerOrchestrator cleanerOrchestrator)
+        ResponseWrapper wrapper, SocketHandler socketHandler, ServerHandler serverHandler)
     {
         _playerData = playerData;
         _db = db;
@@ -26,7 +25,6 @@ public class ConanController : ControllerBase
         _wrapper = wrapper;
         _socketHandler = socketHandler;
         _serverHandler = serverHandler;
-        _cleanerOrchestrator = cleanerOrchestrator;
     }
 
     [HttpPost("login")]
@@ -98,6 +96,5 @@ public class ConanController : ControllerBase
     public async Task GetWs()
     {
         await _socketHandler.Handle(HttpContext, x => _serverHandler.InitialHandler(x, _db));
-        _cleanerOrchestrator.Run();
     }
 }

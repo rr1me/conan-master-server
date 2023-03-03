@@ -8,6 +8,13 @@ namespace conan_master_server.ServerLogic;
 
 public class ServerHandler
 {
+    private readonly CleanerOrchestrator _cleanerOrchestrator;
+
+    public ServerHandler(CleanerOrchestrator cleanerOrchestrator)
+    {
+        _cleanerOrchestrator = cleanerOrchestrator;
+    }
+
     public async Task InitialHandler(string message, DatabaseContext db)
     {
         ServerEntity server;
@@ -37,8 +44,11 @@ public class ServerHandler
         {
             db.Servers.Add(server);
         }
+
+        if (s != null && db.Entry(s).State == EntityState.Unchanged)
+            return;
         
-        if (s == null || db.Entry(s).State != EntityState.Unchanged)
-            await db.SaveChangesAsync();
+        await db.SaveChangesAsync();
+        _cleanerOrchestrator.Run();
     }
 }
