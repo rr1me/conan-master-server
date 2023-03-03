@@ -23,8 +23,8 @@ public class TicketHandler
 
 public class ticketObject
 {
-    public string PlayFabId { get; set; }
-    public string PublisherId { get; set; }
-    public string EntityId { get; set; }
-    public string SessionTicket { get; set; }
+    public string PlayFabId { get; init; }
+    public string PublisherId { get; init; }
+    public string EntityId { get; init; }
+    public string SessionTicket { get; init; }
 }

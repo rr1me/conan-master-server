@@ -2,13 +2,7 @@
 
 public class ResponseWrapper
 {
-    public ResponseWrapper()
-    {
-        code = 200;
-        status = "OK";
-    }
-
-    public int code { get; }
-    public string status { get; }
+    public int code => 200;
+    public string status => "OK";
     public object data { get; set; }
 }

@@ -3,7 +3,6 @@ using conan_master_server.Data;
 using conan_master_server.ModelBinder;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
-using conan_master_server.Tokens;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,8 +37,6 @@ builder.Services.AddSingleton<TicketHandler>();
 builder.Services.AddSingleton<RequestHandler>();
 
 builder.Services.AddSingleton<PlayerData>();
-builder.Services.AddSingleton<TokenGenerator>();
-
 
 builder.Services.AddTransient<TreatmentAssignment>();
 builder.Services.AddTransient<InfoResultPayload>();

@@ -23,7 +23,7 @@ public class ServerCleaner
                 var serversToDelete = _db.Servers.Where(s => s.LastPing < cutoff).ToList();
                 _db.Servers.RemoveRange(serversToDelete);
                 await _db.SaveChangesAsync();
-                await Task.Delay(TimeSpan.FromSeconds(15));
+                await Task.Delay(TimeSpan.FromMinutes(2));
             }
             catch (Exception e)
             {

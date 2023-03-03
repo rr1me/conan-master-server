@@ -14,7 +14,7 @@ class funcWrap
 
 class cloudResp
 {
-    public bool IsPlayerBanned { get; } = false;
+    public bool IsPlayerBanned => false;
     public object ChargebackAdjustedVirtualCurrencies { get; } = new { };
     public object BannedNegativeVirtualCurrencies { get; } = new { };
 }

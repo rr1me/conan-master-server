@@ -11,10 +11,7 @@ public class Params
 
 public class SteamPlayerInfo
 {
-    // [JsonProperty("steamid")]
     public long SteamId { get; set; }
-    // [JsonProperty("personalname")]
     public string PersonaName { get; set; }
-    // [JsonProperty("loccountrycode")]
     public string LocCountryCode { get; set; }
 }

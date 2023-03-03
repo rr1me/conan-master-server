@@ -115,3 +115,9 @@ public class EntityTokenWrapper
         Entity = entity;
     }
 }
+
+public class TokenWrapped
+{
+    public string Token { get; set; }
+    public string Counter { get; set; }
+}

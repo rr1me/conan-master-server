@@ -3,7 +3,6 @@ using conan_master_server.Data;
 using conan_master_server.Models;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
-using conan_master_server.Tokens;
 using Microsoft.AspNetCore.Mvc;
 
 namespace conan_master_server.Controllers;
@@ -64,7 +63,6 @@ public class ConanController : ControllerBase
             return BadRequest("No such user in db");
 
         _wrapper.data = new funcWrap(new TitleInfo(user));
-
         return Ok(_wrapper);
     }
 
@@ -72,7 +70,6 @@ public class ConanController : ControllerBase
     public IActionResult CloudScript()
     {
         _wrapper.data = new funcWrap(new cloudResp());
-
         return Ok(_wrapper);
     }
 
