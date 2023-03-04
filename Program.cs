@@ -14,7 +14,7 @@ builder.Services.AddDbContext<DatabaseContext>(x =>
     var connectionString = builder.Configuration.GetSection("ConnectionString").Value;
     var serverVersion = ServerVersion.AutoDetect(connectionString);
     x.UseMySql(connectionString, serverVersion)
-        .LogTo(Console.WriteLine, new[] { CoreEventId.SaveChangesCompleted, CoreEventId.QueryCompilationStarting });;
+        .LogTo(Console.WriteLine, new[] { CoreEventId.SaveChangesCompleted, CoreEventId.StateChanged });
 });
 
 builder.Services.AddControllers(options =>
@@ -25,7 +25,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging(x => x.AddFile("app.log"));
-builder.WebHost.ConfigureLogging(x => x.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning));
+builder.WebHost.ConfigureLogging(x =>
+{
+    x.AddFilter("Microsoft.EntityFrameworkCore.Database", LogLevel.Warning);
+});
 
 builder.Services.AddHttpClient();
 
@@ -77,10 +80,13 @@ app.Use(async (context, next) =>
     var logger = app.Logger;
 
     var requestPath = context.Request.Path;
-    logger.LogInformation($"Starting: {requestPath} _______________________________________________________________");
+    var requestMethod = context.Request.Method;
+    logger.LogInformation($"Starting: {requestPath} | Method: {requestMethod} _______________________________________________________________");
+    
     await next.Invoke();
+    
     var responseStatusCode = context.Response.StatusCode;
-    logger.LogInformation($"Ending: {requestPath} | Code: {responseStatusCode} _________________________________________________" );
+    logger.LogInformation($"Ending: {requestPath} | Code: {responseStatusCode} __________________________________________________________________" );
 });
 
 app.Run();

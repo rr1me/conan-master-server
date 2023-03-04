@@ -79,13 +79,13 @@ public class ConanController : ControllerBase
     }
 
     [HttpGet("ping")]
-    public IActionResult Ping(string ip, int port)
+    public IActionResult Ping(int port)
     {
-        var id = ip + ":" + port;
+        var id = HttpContext.Connection.RemoteIpAddress + ":" + port;
         var server = _db.Servers.FirstOrDefault(x => x.Id == id);
 
         if (server == null)
-            return BadRequest("No such server in db to ping");
+            return StatusCode(410, "No such server in db.");
 
         server.LastPing = DateTime.Now;
         _db.SaveChanges();
@@ -95,6 +95,6 @@ public class ConanController : ControllerBase
     [HttpGet("ws")]
     public async Task GetWs()
     {
-        await _socketHandler.Handle(HttpContext, x => _serverHandler.InitialHandler(x, _db));
+        await _socketHandler.Handle(HttpContext, (x, y) => _serverHandler.InitialHandler(x, y, _db));
     }
 }

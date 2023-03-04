@@ -5,12 +5,12 @@ namespace conan_master_server.ServerLogic;
 
 public class SocketHandler
 {
-    public async Task Handle(HttpContext httpContext, Func<string, Task> callback)
+    public async Task Handle(HttpContext httpContext, Func<string, string, Task> callback)
     {
         if (httpContext.WebSockets.IsWebSocketRequest)
         {
-            using var webSocket = await httpContext.WebSockets.AcceptWebSocketAsync();
-            await Echo(webSocket, callback);
+            // using var webSocket = await httpContext.WebSockets.AcceptWebSocketAsync();
+            await Echo(httpContext, callback);
         }
         else
         {
@@ -18,16 +18,18 @@ public class SocketHandler
         }
     }
     
-    private async Task Echo(WebSocket webSocket, Func<string, Task> callback)
+    private async Task Echo(HttpContext httpContext, Func<string, string, Task> callback)
     {
+        using var webSocket = await httpContext.WebSockets.AcceptWebSocketAsync();
+        
         var buffer = new byte[1024 * 4];
         var receiveResult = await webSocket.ReceiveAsync(
             new ArraySegment<byte>(buffer), CancellationToken.None);
         while (!receiveResult.CloseStatus.HasValue)
         {
             var message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
-            await callback(message);
-            
+            await callback(message, httpContext.Connection.RemoteIpAddress.ToString());
+
             await webSocket.SendAsync(
                 new ArraySegment<byte>(buffer, 0, receiveResult.Count),
                 receiveResult.MessageType,

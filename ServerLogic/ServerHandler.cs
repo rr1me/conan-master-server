@@ -15,24 +15,25 @@ public class ServerHandler
         _cleanerOrchestrator = cleanerOrchestrator;
     }
 
-    public async Task InitialHandler(string message, DatabaseContext db)
+    public async Task InitialHandler(string message, string remoteIp, DatabaseContext db)
     {
         ServerEntity server;
         try
         {
             var jObj = JObject.Parse(message);
 
-            var id = jObj["serverAddress"];
             var sdObj = jObj["sessionDoc"] as JObject;
+            var id = remoteIp + ":" + sdObj["Port"];
             sdObj.Add("id", id);
 
-            server = JsonConvert.DeserializeObject<ServerEntity>(sdObj.ToString());
+            server = JsonConvert.DeserializeObject<ServerEntity>(sdObj.ToString())!;
         }
         catch (Exception e)
         {
             throw new JsonException("Probably no suitable entity for deserialization. Exact error: "+e.Message);
         }
         
+        server.ip = remoteIp;
         server.LastPing = DateTime.Now;
         
         var s = db.Servers.FirstOrDefault(x => x.Id == server.Id);
