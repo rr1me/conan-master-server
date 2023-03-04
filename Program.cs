@@ -5,6 +5,7 @@ using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,8 @@ builder.Services.AddDbContext<DatabaseContext>(x =>
 {
     var connectionString = builder.Configuration.GetSection("ConnectionString").Value;
     var serverVersion = ServerVersion.AutoDetect(connectionString);
-    x.UseMySql(connectionString, serverVersion);
+    x.UseMySql(connectionString, serverVersion)
+        .LogTo(Console.WriteLine, new[] { CoreEventId.SaveChangesCompleted, CoreEventId.QueryCompilationStarting });;
 });
 
 builder.Services.AddControllers(options =>
@@ -23,6 +25,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging(x => x.AddFile("app.log"));
+builder.WebHost.ConfigureLogging(x => x.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning));
 
 builder.Services.AddHttpClient();
 
@@ -68,5 +71,16 @@ var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 db.Database.EnsureCreated();
 db.SaveChanges();
+
+app.Use(async (context, next) =>
+{
+    var logger = app.Logger;
+
+    var requestPath = context.Request.Path;
+    logger.LogInformation($"Starting: {requestPath} _______________________________________________________________");
+    await next.Invoke();
+    var responseStatusCode = context.Response.StatusCode;
+    logger.LogInformation($"Ending: {requestPath} | Code: {responseStatusCode} _________________________________________________" );
+});
 
 app.Run();

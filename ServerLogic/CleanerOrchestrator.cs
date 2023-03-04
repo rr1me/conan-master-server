@@ -2,18 +2,23 @@
 
 public class CleanerOrchestrator
 {
+    private readonly ILogger<CleanerOrchestrator> _logger;
     private readonly IServiceProvider _provider;
     private Task _serverCleaner;
 
-    public CleanerOrchestrator(IServiceProvider provider)
+    public CleanerOrchestrator(IServiceProvider provider, ILogger<CleanerOrchestrator> logger)
     {
         _provider = provider;
+        _logger = logger;
     }
 
     public void Run()
     {
         if (_serverCleaner is { IsCompleted: false })
-            throw new ApplicationException("Unable to run new task. Task status: " + _serverCleaner.Status);
+        {
+            _logger.LogWarning("Unable to run new task. Task status: " + _serverCleaner.Status);
+            return;
+        }
 
         var scope = _provider.CreateScope().ServiceProvider;
         var cleaner = scope.GetRequiredService<ServerCleaner>();
