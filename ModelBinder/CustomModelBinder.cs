@@ -9,7 +9,6 @@ public class CustomModelBinder : IModelBinder
 {
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {
-        Console.WriteLine(bindingContext);
         if (bindingContext == null)
         {
             throw new ArgumentNullException(nameof(bindingContext));

@@ -82,6 +82,7 @@ app.Use(async (context, next) =>
     var requestPath = context.Request.Path;
     var requestMethod = context.Request.Method;
     logger.LogInformation($"Starting: {requestPath} | Method: {requestMethod} _______________________________________________________________");
+    logger.LogInformation($"Headers: {string.Join(" | ", context.Request.Headers.ToArray())} _______________________________________________________________");
     
     await next.Invoke();
     
