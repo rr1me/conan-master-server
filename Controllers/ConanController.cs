@@ -16,10 +16,10 @@ public class ConanController : ControllerBase
     private readonly SocketHandler _socketHandler;
     private readonly ServerHandler _serverHandler;
 
-    private readonly Logger<ConanController> _logger;
+    private readonly ILogger<ConanController> _logger;
 
     public ConanController(PlayerData playerData, DatabaseContext db, RandomGenerator randomGenerator,
-        ResponseWrapper wrapper, SocketHandler socketHandler, ServerHandler serverHandler, Logger<ConanController> logger)
+        ResponseWrapper wrapper, SocketHandler socketHandler, ServerHandler serverHandler, ILogger<ConanController> logger)
     {
         _playerData = playerData;
         _db = db;
