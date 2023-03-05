@@ -32,7 +32,7 @@ builder.WebHost.ConfigureLogging(x =>
     x
         .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning)
         .AddFilter("Microsoft.EntityFrameworkCore.Update", LogLevel.Debug)
-        .AddFilter("Microsoft.EntityFrameworkCore.ChangeTracking.StateChanged", LogLevel.Debug);
+        .AddFilter("Microsoft.EntityFrameworkCore.ChangeTracking", LogLevel.Debug);
 });
 
 builder.Services.AddHttpClient();
