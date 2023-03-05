@@ -88,7 +88,7 @@ public class ConanController : ControllerBase
         
         _logger.LogInformation(remoteIp.ToString());
         
-        var id = HttpContext.Connection.RemoteIpAddress + ":" + port;
+        var id = remoteIp + ":" + port;
         var server = _db.Servers.FirstOrDefault(x => x.Id == id);
 
         if (server == null)
