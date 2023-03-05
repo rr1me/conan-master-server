@@ -5,7 +5,6 @@ using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +12,7 @@ builder.Services.AddDbContext<DatabaseContext>(x =>
 {
     var connectionString = builder.Configuration.GetSection("ConnectionString").Value;
     var serverVersion = ServerVersion.AutoDetect(connectionString);
-    x.UseMySql(connectionString, serverVersion)
-        .LogTo(Console.WriteLine, new[] { CoreEventId.SaveChangesCompleted, CoreEventId.StateChanged });
+    x.UseMySql(connectionString, serverVersion);
 });
 
 builder.Services.AddControllers(options =>
@@ -24,10 +22,17 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddLogging(x => x.AddFile("app.log"));
+builder.Services.AddLogging(x =>
+{
+    x.AddFile("app.log", x=>x.MinLevel = LogLevel.Debug);
+});
 builder.WebHost.ConfigureLogging(x =>
 {
-    x.AddFilter("Microsoft.EntityFrameworkCore.Database", LogLevel.Warning);
+    x.AddConsole();
+    x
+        .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning)
+        .AddFilter("Microsoft.EntityFrameworkCore.Update", LogLevel.Debug)
+        .AddFilter("Microsoft.EntityFrameworkCore.ChangeTracking.StateChanged", LogLevel.Debug);
 });
 
 builder.Services.AddHttpClient();
@@ -85,7 +90,7 @@ app.Use(async (context, next) =>
     logger.LogInformation($"Headers: {string.Join(" | ", context.Request.Headers.ToArray())} _______________________________________________________________");
     
     await next.Invoke();
-    
+
     var responseStatusCode = context.Response.StatusCode;
     logger.LogInformation($"Ending: {requestPath} | Code: {responseStatusCode} __________________________________________________________________" );
 });
