@@ -19,7 +19,7 @@ public class ConanController : ControllerBase
     private readonly Logger<ConanController> _logger;
 
     public ConanController(PlayerData playerData, DatabaseContext db, RandomGenerator randomGenerator,
-        ResponseWrapper wrapper, SocketHandler socketHandler, ServerHandler serverHandler)
+        ResponseWrapper wrapper, SocketHandler socketHandler, ServerHandler serverHandler, Logger<ConanController> logger)
     {
         _playerData = playerData;
         _db = db;
@@ -27,6 +27,7 @@ public class ConanController : ControllerBase
         _wrapper = wrapper;
         _socketHandler = socketHandler;
         _serverHandler = serverHandler;
+        _logger = logger;
     }
 
     [HttpPost("login")]
