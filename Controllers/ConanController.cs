@@ -16,6 +16,8 @@ public class ConanController : ControllerBase
     private readonly SocketHandler _socketHandler;
     private readonly ServerHandler _serverHandler;
 
+    private readonly Logger<ConanController> _logger;
+
     public ConanController(PlayerData playerData, DatabaseContext db, RandomGenerator randomGenerator,
         ResponseWrapper wrapper, SocketHandler socketHandler, ServerHandler serverHandler)
     {
@@ -81,6 +83,10 @@ public class ConanController : ControllerBase
     [HttpGet("ping")]
     public IActionResult Ping(int port)
     {
+        var remoteIp = HttpContext.Connection.RemoteIpAddress;
+        
+        _logger.LogInformation(remoteIp.ToString());
+        
         var id = HttpContext.Connection.RemoteIpAddress + ":" + port;
         var server = _db.Servers.FirstOrDefault(x => x.Id == id);
 
