@@ -28,6 +28,7 @@ public class SocketHandler
         {
             var message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
             var remoteIp = httpContext.Request.Headers["X-Forwarded-For"];
+            Console.WriteLine(remoteIp.ToString() + " omfg " + httpContext.Connection.RemoteIpAddress.ToString());
             await callback(message, remoteIp.ToString() != null? remoteIp : httpContext.Connection.RemoteIpAddress.ToString());
 
             await webSocket.SendAsync(
