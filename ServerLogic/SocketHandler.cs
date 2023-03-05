@@ -9,7 +9,6 @@ public class SocketHandler
     {
         if (httpContext.WebSockets.IsWebSocketRequest)
         {
-            // using var webSocket = await httpContext.WebSockets.AcceptWebSocketAsync();
             await Echo(httpContext, callback);
         }
         else
@@ -28,7 +27,8 @@ public class SocketHandler
         while (!receiveResult.CloseStatus.HasValue)
         {
             var message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
-            await callback(message, httpContext.Request.Headers["X-Forwarded-For"]);
+            var remoteIp = httpContext.Request.Headers["X-Forwarded-For"];
+            await callback(message, remoteIp.ToString() != null? remoteIp : httpContext.Connection.RemoteIpAddress.ToString());
 
             await webSocket.SendAsync(
                 new ArraySegment<byte>(buffer, 0, receiveResult.Count),
