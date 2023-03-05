@@ -84,7 +84,7 @@ public class ConanController : ControllerBase
     [HttpGet("ping")]
     public IActionResult Ping(int port)
     {
-        var remoteIp = HttpContext.Connection.RemoteIpAddress;
+        var remoteIp = HttpContext.Request.Headers["X-Forwarded-For"];
         
         _logger.LogInformation(remoteIp.ToString());
         
