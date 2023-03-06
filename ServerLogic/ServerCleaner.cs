@@ -19,21 +19,28 @@ public class ServerCleaner
         {
             try
             {
+                _logger.LogInformation("Clearing task iteration started");
                 if (!_db.Servers.Any())
                 {
-                    _logger.LogInformation("Finishing clear task due to empty servers db");
+                    _logger.LogInformation("Finishing clearing task due to empty servers db");
                     break;
                 }
 
                 var cutoff = DateTime.Now.AddMinutes(-2);
                 var serversToDelete = _db.Servers.Where(s => s.LastPing < cutoff).ToList();
                 _db.Servers.RemoveRange(serversToDelete);
-                await _db.SaveChangesAsync();
+                var changes = await _db.SaveChangesAsync();
+                
+                _logger.LogInformation($"Clearing task iteration finished. Entities to delete: {changes}" +
+                                       (changes > 0 ? 
+                                           ". Ids: " + string.Join(" | ", serversToDelete.Select(x => x.Id))
+                                           : null));
+                
                 await Task.Delay(TimeSpan.FromMinutes(2));
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                _logger.LogWarning("Task exception. Error message: " + e.Message);
                 break;
             }
         }

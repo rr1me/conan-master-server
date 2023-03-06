@@ -24,9 +24,8 @@ public class CustomModelBinder : IModelBinder
             var model = JsonConvert.DeserializeObject<TokenRequest>(body);
             bindingContext.Result = ModelBindingResult.Success(model);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine(ex.Message);
             bindingContext.Result = ModelBindingResult.Failed();
         }
     }

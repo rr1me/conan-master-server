@@ -14,11 +14,8 @@ public class CleanerOrchestrator
 
     public void Run()
     {
-        if (_serverCleaner is { IsCompleted: false })
-        {
-            _logger.LogWarning("Unable to run new task. Task status: " + _serverCleaner.Status);
-            return;
-        }
+        _logger.LogInformation("Trying to run cleaner task. Status: " + (_serverCleaner is not null ? _serverCleaner.Status : "Task wasn't created"));
+        if (_serverCleaner is { IsCompleted: false }) return;
 
         var scope = _provider.CreateScope().ServiceProvider;
         var cleaner = scope.GetRequiredService<ServerCleaner>();

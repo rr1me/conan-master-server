@@ -82,21 +82,19 @@ public class ConanController : ControllerBase
     }
 
     [HttpGet("ping")]
-    public IActionResult Ping(int port)
+    public async Task<IActionResult> Ping(int port)
     {
-        var smip = "91.233.169.34";
-        var remoteIp = HttpContext.Request.Headers["X-Forwarded-For"].ToString();
-        var ip = remoteIp is "192.168.0.202" or "192.168.0.201" ? smip : remoteIp;
+        var remoteIp = HttpContext.Connection.RemoteIpAddress.ToString();
         
-        var id = ip + ":" + port;
-        _logger.LogInformation($"{ip} | {remoteIp} | {id}");
+        var id = remoteIp + ":" + port;
+        _logger.LogInformation($"Pinging: {id}");
         var server = _db.Servers.FirstOrDefault(x => x.Id == id);
 
         if (server == null)
             return StatusCode(410, "No such server in db.");
 
         server.LastPing = DateTime.Now;
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
         return Ok();
     }
 

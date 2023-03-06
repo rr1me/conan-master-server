@@ -22,15 +22,14 @@ public class ServerHandler
     public async Task InitialHandler(string message, string remoteIp, DatabaseContext db)
     {
         ServerEntity server;
-        var ip = remoteIp is "192.168.0.202" or "192.168.0.201" ? smip : remoteIp;
         try
         {
             var jObj = JObject.Parse(message);
 
             var sdObj = jObj["sessionDoc"] as JObject;
-            var id = ip + ":" + sdObj["Port"];
+            var id = remoteIp + ":" + sdObj["Port"];
             
-            _logger.LogInformation($"{ip} | {remoteIp} | {id}");
+            _logger.LogInformation($"Connection: {id}");
             
             sdObj.Add("id", id);
 
@@ -38,10 +37,11 @@ public class ServerHandler
         }
         catch (Exception e)
         {
-            throw new JsonException("Probably no suitable entity for deserialization. Exact error: "+e.Message);
+            _logger.LogError("Probably no suitable entity for deserialization. Exact error: "+e.Message);
+            return;
         }
         
-        server.ip = ip;
+        server.ip = remoteIp;
         server.LastPing = DateTime.Now;
         
         var s = db.Servers.FirstOrDefault(x => x.Id == server.Id);

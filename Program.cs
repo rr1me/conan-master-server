@@ -1,8 +1,10 @@
+using System.Net;
 using conan_master_server.Additional;
 using conan_master_server.Data;
 using conan_master_server.ModelBinder;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +57,11 @@ builder.Services.AddTransient<LoginData>();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.All
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -63,30 +70,34 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 
-var webSocketOptions = new WebSocketOptions
+app.UseWebSockets(new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(2)
-};
-app.UseWebSockets(webSocketOptions);
+});
 
 var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 db.Database.EnsureCreated();
 db.SaveChanges();
 
+app.UseServerIpMiddleware();
+
 app.Use(async (context, next) =>
 {
     var logger = app.Logger;
-
-    var requestPath = context.Request.Path;
-    var requestMethod = context.Request.Method;
-    logger.LogInformation($"Starting: {requestPath} | Method: {requestMethod} _______________________________________________________________");
-    logger.LogInformation($"Headers: {string.Join(" | ", context.Request.Headers.ToArray())} _______________________________________________________________");
     
+    var request = context.Request;
+
+    var requestPath = request.Path;
+    var requestMethod = request.Method;
+    var remoteIp = context.Connection.RemoteIpAddress.ToString();
+    logger.LogInformation($"Starting: {requestPath} | Method: {requestMethod} | RemoteIp: {remoteIp}");
+    logger.LogInformation($"Headers: {string.Join(" | ", request.Headers.ToArray())}");
+
     await next.Invoke();
 
     var responseStatusCode = context.Response.StatusCode;
-    logger.LogInformation($"Ending: {requestPath} | Code: {responseStatusCode} __________________________________________________________________" );
+    logger.LogInformation($"Ending: {requestPath} | Code: {responseStatusCode}");
 });
 
 app.Run();
