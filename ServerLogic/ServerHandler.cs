@@ -11,9 +11,10 @@ public class ServerHandler
     private readonly CleanerOrchestrator _cleanerOrchestrator;
     private readonly ILogger<ServerHandler> _logger;
 
-    public ServerHandler(CleanerOrchestrator cleanerOrchestrator)
+    public ServerHandler(CleanerOrchestrator cleanerOrchestrator, ILogger<ServerHandler> logger)
     {
         _cleanerOrchestrator = cleanerOrchestrator;
+        _logger = logger;
     }
 
     private const string smip = "91.233.169.34";
