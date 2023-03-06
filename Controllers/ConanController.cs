@@ -84,11 +84,12 @@ public class ConanController : ControllerBase
     [HttpGet("ping")]
     public IActionResult Ping(int port)
     {
-        var remoteIp = HttpContext.Request.Headers["X-Forwarded-For"];
+        var smip = "91.233.169.34";
+        var remoteIp = HttpContext.Request.Headers["X-Forwarded-For"].ToString();
+        var ip = remoteIp is "192.168.0.202" or "192.168.0.201" ? smip : remoteIp;
         
-        _logger.LogInformation(remoteIp.ToString());
-        
-        var id = remoteIp + ":" + port;
+        var id = ip + ":" + port;
+        _logger.LogInformation($"{ip} | {remoteIp} | {id}");
         var server = _db.Servers.FirstOrDefault(x => x.Id == id);
 
         if (server == null)

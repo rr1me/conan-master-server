@@ -3,7 +3,6 @@ using conan_master_server.Data;
 using conan_master_server.ModelBinder;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
