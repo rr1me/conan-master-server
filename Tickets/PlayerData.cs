@@ -35,7 +35,7 @@ public class PlayerData
             {
                 SteamId = steamId,
                 EntityId = ticketObject.EntityId,
-                Ip = httpContext.Request.Host.Host,
+                Ip = httpContext.Connection.RemoteIpAddress.ToString(),
                 PlayfabId = ticketObject.PlayFabId,
                 PublisherId = ticketObject.PublisherId,
                 SpecId = titleId, //?

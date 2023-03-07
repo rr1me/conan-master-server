@@ -45,7 +45,10 @@ public class ConanController : ControllerBase
         var user = _db.Users.FirstOrDefault(x => x.Ticket == ticket);
 
         if (user == null)
-            return BadRequest("No such user in db");
+            return StatusCode(410, "No such user in db");
+
+        user.Ip = HttpContext.Connection.RemoteIpAddress.ToString();
+        _db.SaveChanges();
 
         _wrapper.data = new funcWrap(new TokenWrapped
         {
@@ -61,7 +64,7 @@ public class ConanController : ControllerBase
         var user = _db.Users.FirstOrDefault(x => x.Token == tokenWrapped.Token);
 
         if (user == null)
-            return BadRequest("No such user in db");
+            return StatusCode(410, "No such user in db");
 
         _wrapper.data = new funcWrap(new AuthResponse(user));
         return Ok(_wrapper);
