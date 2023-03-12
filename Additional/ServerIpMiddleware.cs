@@ -7,17 +7,20 @@ public class ServerIpMiddleware
     private const string SMIP = "91.233.169.34";
 
     private readonly RequestDelegate _next;
+    private readonly IConfiguration _config;
 
-    public ServerIpMiddleware(RequestDelegate next)
+    public ServerIpMiddleware(RequestDelegate next, IConfiguration config)
     {
         _next = next;
+        _config = config;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
         var remoteIp = context.Connection.RemoteIpAddress.ToString();
 
-        if (remoteIp is "192.168.0.202" or "192.168.0.201")
+        var localIp = _config.GetSection("LocalIp").ToString(); 
+        if (remoteIp == localIp)
             context.Connection.RemoteIpAddress = IPAddress.Parse(SMIP);
 
         await _next(context);
