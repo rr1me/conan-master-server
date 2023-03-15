@@ -33,7 +33,14 @@ public class ConanController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AuthTicket authTicket)
     {
-        _wrapper.data = await _playerData.Generate(authTicket, _db, HttpContext, _randomGenerator);
+        try
+        {
+            _wrapper.data = await _playerData.Generate(authTicket, _db, HttpContext, _randomGenerator);
+        }
+        catch (ArgumentException e)
+        {
+            return StatusCode(406, e.Message);
+        }
         return Ok(_wrapper);
     }
 
