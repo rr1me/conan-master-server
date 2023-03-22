@@ -139,6 +139,11 @@ public class AuthResponse
         {
             new()
             {
+                Id = "DLC_Siptah",
+                Name = "DLC_Siptah"
+            },
+            new()
+            {
                 Id = "MAIN_TITLE_STAGING",
                 Name = "MAIN_TITLE_STAGING"
             },
