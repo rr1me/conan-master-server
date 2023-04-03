@@ -56,6 +56,6 @@ public class ServerEntity
     public string guid { get; set; }
     public int port { get; set; }
     public string se { get; set; }
-    public string mods { get; set; }
-    public string online { get; set; }
+    public string? mods { get; set; }
+    public string? online { get; set; }
 }
