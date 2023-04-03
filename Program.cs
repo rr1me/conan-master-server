@@ -75,11 +75,6 @@ app.UseWebSockets(new WebSocketOptions
     KeepAliveInterval = TimeSpan.FromMinutes(2)
 });
 
-var scope = app.Services.CreateScope();
-var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-db.Database.EnsureCreated();
-db.SaveChanges();
-
 app.UseServerIpMiddleware();
 
 app.Use(async (context, next) =>
