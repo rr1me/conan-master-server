@@ -8,18 +8,22 @@ public class ServerIpMiddleware
 
     private readonly RequestDelegate _next;
     private readonly IConfiguration _config;
+    private readonly ILogger<ServerIpMiddleware> _logger;
 
-    public ServerIpMiddleware(RequestDelegate next, IConfiguration config)
+    public ServerIpMiddleware(RequestDelegate next, IConfiguration config, ILogger<ServerIpMiddleware> logger)
     {
         _next = next;
         _config = config;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
         var remoteIp = context.Connection.RemoteIpAddress.ToString();
 
-        var localIp = _config.GetSection("LocalIp").ToString(); 
+        var localIp = _config.GetSection("LocalIp").Value;
+        _logger.LogInformation(
+            $"ServerIpMiddleware. RemoteIP: {remoteIp} | LocalIP: {localIp} | Equal: {remoteIp == localIp}");
         if (remoteIp == localIp)
             context.Connection.RemoteIpAddress = IPAddress.Parse(SMIP);
 
