@@ -14,7 +14,7 @@ public class RequestHandler
         _clientFactory = clientFactory;
     }
     
-    private const string KEY = "8CF99D23F41695F00F8932D1BDC62400";
+    private const string KEY = "0C26A951282D879B22CEC44F9B87F546";
     
     private const string STEAM_TICKETAUTH_URL = "https://api.steampowered.com/ISteamUserAuth/AuthenticateUserTicket/v0001/";
     private const string STEAM_GETUSER_URL = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/";
