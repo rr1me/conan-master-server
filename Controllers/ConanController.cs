@@ -5,6 +5,8 @@ using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics.Metrics;
 using System.Net;
 using System.Text;
 
@@ -76,17 +78,17 @@ public class ConanController : ControllerBase
         if (user == null)
         {
             string apiUrl = "https://exiles-fls-live.azurewebsites.net/api/VerifyIdentity?code=OOsFrduVe5Ph8HLvZB58YDSvv20WTHzYMaeH9dCB7HBM7TYpedALuA==";
-
-            // Преобразование объекта в JSON-строку
-            string requestBody = JsonConvert.SerializeObject(tokenWrapped);
-
             // Создание объекта запроса
             var request = (HttpWebRequest)WebRequest.Create(apiUrl);
             request.Method = "POST";
             request.ContentType = "application/json";
-
+            // Создаем JSON-строку с телом запроса, используя строковую интерполяцию
+            string json = $@"{{
+            ""Token"": ""{tokenWrapped.Token}"",
+            ""Counter"": ""{tokenWrapped.Counter}""
+            }}";
             // Конвертация содержимого тела запроса в байты
-            byte[] byteData = Encoding.UTF8.GetBytes(requestBody);
+            byte[] byteData = Encoding.UTF8.GetBytes(json);
 
             // Установка заголовка Content-Length
             request.ContentLength = byteData.Length;
@@ -106,6 +108,7 @@ public class ConanController : ControllerBase
                     string responseText = streamReader.ReadToEnd();
                     if (responseText.Contains("MAIN_TITLE_STAGING"))
                     {
+                        
                         return Ok(responseText);
                     }
                     else
