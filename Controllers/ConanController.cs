@@ -4,6 +4,9 @@ using conan_master_server.Models;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Net;
+using System.Text;
 
 namespace conan_master_server.Controllers;
 
@@ -71,7 +74,47 @@ public class ConanController : ControllerBase
         var user = _db.Users.FirstOrDefault(x => x.Token == tokenWrapped.Token);
 
         if (user == null)
-            return StatusCode(410, "No such user in db");
+        {
+            string apiUrl = "https://exiles-fls-live.azurewebsites.net/api/VerifyIdentity?code=OOsFrduVe5Ph8HLvZB58YDSvv20WTHzYMaeH9dCB7HBM7TYpedALuA==";
+
+            // Преобразование объекта в JSON-строку
+            string requestBody = JsonConvert.SerializeObject(tokenWrapped);
+
+            // Создание объекта запроса
+            var request = (HttpWebRequest)WebRequest.Create(apiUrl);
+            request.Method = "POST";
+            request.ContentType = "application/json";
+
+            // Конвертация содержимого тела запроса в байты
+            byte[] byteData = Encoding.UTF8.GetBytes(requestBody);
+
+            // Установка заголовка Content-Length
+            request.ContentLength = byteData.Length;
+
+            // Запись содержимого тела запроса в поток запроса
+            using (var stream = request.GetRequestStream())
+            {
+                stream.Write(byteData, 0, byteData.Length);
+            }
+
+            // Отправка запроса и получение ответа
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                // Чтение ответа сервера
+                using (var streamReader = new System.IO.StreamReader(response.GetResponseStream()))
+                {
+                    string responseText = streamReader.ReadToEnd();
+                    if (responseText.Contains("MAIN_TITLE_STAGING"))
+                    {
+                        return Ok(responseText);
+                    }
+                    else
+                    {
+                        return StatusCode(410, "No such user in db");
+                    }
+                }
+            }
+        }
 
         _wrapper.data = new funcWrap(new AuthResponse(user));
         return Ok(_wrapper);
