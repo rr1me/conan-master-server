@@ -30,7 +30,11 @@ public class ServerHandler
             var id = remoteIp + ":" + sdObj["Port"];
             
             _logger.LogInformation($"Connection: {id}");
-            
+            if (sdObj["ip"].ToString().Contains("192.168.0.211"))
+            {
+                sdObj["CSF"] = 1;
+                sdObj["Name"] = "FreeTP#1";
+            }
             sdObj.Add("id", id);
 
             server = JsonConvert.DeserializeObject<ServerEntity>(sdObj.ToString())!;
