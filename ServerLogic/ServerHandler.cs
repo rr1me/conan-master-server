@@ -10,14 +10,14 @@ public class ServerHandler
 {
     private readonly CleanerOrchestrator _cleanerOrchestrator;
     private readonly ILogger<ServerHandler> _logger;
+    private readonly IConfiguration _config;
 
-    public ServerHandler(CleanerOrchestrator cleanerOrchestrator, ILogger<ServerHandler> logger)
+    public ServerHandler(CleanerOrchestrator cleanerOrchestrator, ILogger<ServerHandler> logger, IConfiguration config)
     {
         _cleanerOrchestrator = cleanerOrchestrator;
         _logger = logger;
+        _config = config;
     }
-
-    private const string smip = "91.233.169.34";
     
     public async Task InitialHandler(string message, string remoteIp, DatabaseContext db)
     {
@@ -30,11 +30,13 @@ public class ServerHandler
             var id = remoteIp + ":" + sdObj["Port"];
             
             _logger.LogInformation($"Connection: {id}");
-            if (sdObj["ip"].ToString().Contains("192.168.0.211"))
+            
+            if (sdObj["ip"].Contains(_config.GetSection("LocalIp").Value))
             {
                 sdObj["CSF"] = 1;
                 sdObj["Name"] = "FreeTP#1";
             }
+            
             sdObj.Add("id", id);
 
             server = JsonConvert.DeserializeObject<ServerEntity>(sdObj.ToString())!;

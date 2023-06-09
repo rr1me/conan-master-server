@@ -43,7 +43,8 @@ public class PlayerData
                 Token = randomGenerator.GenerateToken(), //?
                 Username = accountInfo.PersonaName, //?
                 CreationDate = DateTime.UtcNow,
-                Identifier = randomGenerator.Generate5()
+                Identifier = randomGenerator.Generate5(),
+                BpLevel = 1
             };
 
             db.Users.Add(user);
@@ -57,5 +58,17 @@ public class PlayerData
         irp.PlayerProfile = new PlayerProfile(user);
         _loginData.EntityToken = new EntityTokenWrapper(new TitlePlayerAccount(user.EntityId));
         return _loginData;
+    }
+
+    public async Task<string> LicenseCheck(TokenWrapped tokenWrapped) =>
+        await _requestHandler.MakeFancomRequest(tokenWrapped);
+
+    public IEnumerable<string> GetBpItems(DatabaseContext db, long SteamId)
+    {
+        var user = db.Users.FirstOrDefault(x => x.SteamId == SteamId);
+        var battlePass = db.BattlePasses.FirstOrDefault(x => x.Level == user.BpLevel);
+
+        // return battlePass.Items.Split(',').Select(x => "{Id3-" + x + "}");
+        return battlePass.Items.Split(',').Select(x => $"{{Id3-{x}}}");
     }
 }

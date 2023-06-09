@@ -20,4 +20,6 @@ public class ConanUser
     
     public DateTime CreationDate { get; set; }
     public int Identifier { get; set; }
+    
+    public int BpLevel { get; set; }
 }

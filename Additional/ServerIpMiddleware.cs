@@ -4,8 +4,6 @@ namespace conan_master_server.Additional;
 
 public class ServerIpMiddleware
 {
-    private const string SMIP = "91.233.169.34";
-
     private readonly RequestDelegate _next;
     private readonly IConfiguration _config;
     private readonly ILogger<ServerIpMiddleware> _logger;
@@ -25,7 +23,7 @@ public class ServerIpMiddleware
         _logger.LogInformation(
             $"ServerIpMiddleware. RemoteIP: {remoteIp} | LocalIP: {localIp} | Equal: {remoteIp == localIp}");
         if (remoteIp == localIp)
-            context.Connection.RemoteIpAddress = IPAddress.Parse(SMIP);
+            context.Connection.RemoteIpAddress = IPAddress.Parse(_config.GetSection("ExternalIp").Value);
 
         await _next(context);
     }

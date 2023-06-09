@@ -7,6 +7,7 @@ public class DatabaseContext : DbContext
 {
     public DbSet<ConanUser> Users { get; set; }
     public DbSet<ServerEntity> Servers { get; set; }
+    public DbSet<BattlePass> BattlePasses { get; set; }
 
     public DatabaseContext(DbContextOptions options) : base(options)
     {

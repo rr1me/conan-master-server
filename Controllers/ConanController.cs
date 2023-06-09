@@ -71,52 +71,14 @@ public class ConanController : ControllerBase
     }
 
     [HttpPost("auth")]
-    public IActionResult Auth([FromBody] TokenWrapped tokenWrapped)
+    public async Task<IActionResult> Auth([FromBody] TokenWrapped tokenWrapped)
     {
         var user = _db.Users.FirstOrDefault(x => x.Token == tokenWrapped.Token);
 
         if (user == null)
         {
-            string apiUrl = "https://exiles-fls-live.azurewebsites.net/api/VerifyIdentity?code=OOsFrduVe5Ph8HLvZB58YDSvv20WTHzYMaeH9dCB7HBM7TYpedALuA==";
-            // Создание объекта запроса
-            var request = (HttpWebRequest)WebRequest.Create(apiUrl);
-            request.Method = "POST";
-            request.ContentType = "application/json";
-            // Создаем JSON-строку с телом запроса, используя строковую интерполяцию
-            string json = $@"{{
-            ""Token"": ""{tokenWrapped.Token}"",
-            ""Counter"": ""{tokenWrapped.Counter}""
-            }}";
-            // Конвертация содержимого тела запроса в байты
-            byte[] byteData = Encoding.UTF8.GetBytes(json);
-
-            // Установка заголовка Content-Length
-            request.ContentLength = byteData.Length;
-
-            // Запись содержимого тела запроса в поток запроса
-            using (var stream = request.GetRequestStream())
-            {
-                stream.Write(byteData, 0, byteData.Length);
-            }
-
-            // Отправка запроса и получение ответа
-            using (var response = (HttpWebResponse)request.GetResponse())
-            {
-                // Чтение ответа сервера
-                using (var streamReader = new System.IO.StreamReader(response.GetResponseStream()))
-                {
-                    string responseText = streamReader.ReadToEnd();
-                    if (responseText.Contains("MAIN_TITLE_STAGING"))
-                    {
-                        
-                        return Ok(responseText);
-                    }
-                    else
-                    {
-                        return StatusCode(410, "No such user in db");
-                    }
-                }
-            }
+            var response = await _playerData.LicenseCheck(tokenWrapped);
+            return response.Contains("MAIN_TITLE_STAGING") ? Ok(response) : StatusCode(410, "No such user in db");
         }
 
         _wrapper.data = new funcWrap(new AuthResponse(user));
@@ -127,6 +89,14 @@ public class ConanController : ControllerBase
     public IActionResult CloudScript()
     {
         _wrapper.data = new funcWrap(new cloudResp());
+        return Ok(_wrapper);
+    }
+
+    [HttpPost("battlepass")]
+    public IActionResult BattlePass([FromBody]BpRequest bpRequest)
+    {
+        var bpItems = _playerData.GetBpItems(_db, bpRequest.NativePlayerId);
+        _wrapper.data = new funcWrap(new BpResponse(bpItems));
         return Ok(_wrapper);
     }
 

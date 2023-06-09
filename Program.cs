@@ -1,6 +1,7 @@
 using System.Net;
 using conan_master_server.Additional;
 using conan_master_server.Data;
+using conan_master_server.Entities;
 using conan_master_server.ModelBinder;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
@@ -76,6 +77,12 @@ app.UseWebSockets(new WebSocketOptions
 });
 
 app.UseServerIpMiddleware();
+
+// var db = app.Services.CreateScope().ServiceProvider.GetService<DatabaseContext>();
+// db.Database.EnsureDeleted();
+// db.Database.EnsureCreated();
+// db.Users.Add(new ConanUser());
+// db.SaveChanges();
 
 app.Use(async (context, next) =>
 {
