@@ -1,7 +1,5 @@
-using System.Net;
 using conan_master_server.Additional;
 using conan_master_server.Data;
-using conan_master_server.Entities;
 using conan_master_server.ModelBinder;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
@@ -21,8 +19,6 @@ builder.Services.AddControllers(options =>
 {
     options.ModelBinderProviders.Insert(0, new CustomModelBinderProvider());
 });
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging(x =>
 {
@@ -63,12 +59,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.All
 });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("http://localhost:5030/swagger/v1/swagger.json", "conan-master-server v1"));
-}
-
 app.MapControllers();
 
 app.UseWebSockets(new WebSocketOptions
@@ -77,12 +67,6 @@ app.UseWebSockets(new WebSocketOptions
 });
 
 app.UseServerIpMiddleware();
-
-// var db = app.Services.CreateScope().ServiceProvider.GetService<DatabaseContext>();
-// db.Database.EnsureDeleted();
-// db.Database.EnsureCreated();
-// db.Users.Add(new ConanUser());
-// db.SaveChanges();
 
 app.Use(async (context, next) =>
 {

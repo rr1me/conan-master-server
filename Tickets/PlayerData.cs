@@ -63,12 +63,19 @@ public class PlayerData
     public async Task<string> LicenseCheck(TokenWrapped tokenWrapped) =>
         await _requestHandler.MakeFancomRequest(tokenWrapped);
 
-    public IEnumerable<string> GetBpItems(DatabaseContext db, long SteamId)
+    public bool TryGetBpItems(DatabaseContext db, long SteamId, out IEnumerable<string>? items)
     {
         var user = db.Users.FirstOrDefault(x => x.SteamId == SteamId);
+
+        if (user == null)
+        {
+            items = null;
+            return false;
+        }
+        
         var battlePass = db.BattlePasses.FirstOrDefault(x => x.Level == user.BpLevel);
 
-        // return battlePass.Items.Split(',').Select(x => "{Id3-" + x + "}");
-        return battlePass.Items.Split(',').Select(x => $"{{Id3-{x}}}");
+        items = battlePass.Items.Split(',').Select(x => $"{{Id3-{x}}}");
+        return true;
     }
 }

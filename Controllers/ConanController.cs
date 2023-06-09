@@ -4,11 +4,6 @@ using conan_master_server.Models;
 using conan_master_server.ServerLogic;
 using conan_master_server.Tickets;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Diagnostics.Metrics;
-using System.Net;
-using System.Text;
 
 namespace conan_master_server.Controllers;
 
@@ -95,8 +90,10 @@ public class ConanController : ControllerBase
     [HttpPost("battlepass")]
     public IActionResult BattlePass([FromBody]BpRequest bpRequest)
     {
-        var bpItems = _playerData.GetBpItems(_db, bpRequest.NativePlayerId);
-        _wrapper.data = new funcWrap(new BpResponse(bpItems));
+        if (!_playerData.TryGetBpItems(_db, bpRequest.NativePlayerId, out var items))
+            return StatusCode(410, "No such user in db");
+            
+        _wrapper.data = new funcWrap(new BpResponse(items));
         return Ok(_wrapper);
     }
 
