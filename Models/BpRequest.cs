@@ -7,10 +7,20 @@ public class BpRequest
 
 public class BpResponse
 {
-    public IEnumerable<string> DurablePlayerRewards { get; }
+    public IEnumerable<BpItem> DurablePlayerRewards { get; }
 
-    public BpResponse(IEnumerable<string> durablePlayerRewards)
+    public BpResponse(IEnumerable<BpItem> durablePlayerRewards)
     {
         DurablePlayerRewards = durablePlayerRewards;
+    }
+}
+
+public class BpItem
+{
+    public string Id { get; }
+
+    public BpItem(string id)
+    {
+        Id = id;
     }
 }
